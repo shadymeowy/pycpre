@@ -1,0 +1,71 @@
+from .cobjects import *;
+from .generic import *;
+
+default_space = Namespace();
+default_space.add = cmacro(a, b) {((a)+(b))};
+default_space.sub = cmacro(a, b) {((a)-(b))};
+default_space.mul = cmacro(a, b) {((a)*(b))};
+default_space.div = cmacro(a, b) {((a)/(b))};
+default_space.eq = cmacro (a, b) {((a)==(b))};
+default_space.ne = cmacro (a, b) {((a)!=(b))};
+default_space.lt = cmacro (a, b) {((a)<(b))};
+default_space.gt = cmacro (a, b) {((a)>(b))};
+default_space.le = cmacro (a, b) {((a)<=(b))};
+default_space.ge = cmacro (a, b) {((a)>=(b))};
+default_space.mod = cmacro (a, b) {((a) % (b))};
+default_space.lnot = cmacro (a) {(!(a))};
+default_space.neg = cmacro (a) {(-(a))};
+default_space.pos = cmacro (a) {(+(a))};
+default_space.lshift = cmacro(a, b) {((a)<<(b))};
+default_space.rshift = cmacro(a, b) {((a)>>(b))};
+default_space.land = cmacro(a, b) {((a)&&(b))};
+default_space.lor = cmacro(a, b) {((a)||(b))};
+default_space.band = cmacro(a, b) {((a)&(b))};
+default_space.bor = cmacro(a, b) {((a)|(b))};
+default_space.xor = cmacro(a, b) {((a)^(b))};
+default_space.bnot = cmacro(a) {(~(a))};
+default_space.iadd1 = cmacro (a) {((a)++;};
+default_space.isub1 = cmacro (a) {((a)--;};
+default_space.assign = cmacro (a, b) {(a)=(b);};
+default_space.iadd = cmacro (a, b) {(a)+=(b);};
+default_space.isub = cmacro (a, b) {(a)-=(b);};
+default_space.imul = cmacro (a, b) {(a)*=(b);};
+default_space.idiv = cmacro (a, b) {(a)/=(b);};
+default_space.imod = cmacro (a, b) {(a)%=(b);};
+default_space.isub = cmacro (a, b) {(a)<<=(b);};
+default_space.ilshift = cmacro (a, b) {(a)>>=(b);};
+default_space.irshift = cmacro (a, b) {(a)/=(b);};
+default_space.iband = cmacro (a, b) {(a)&=(b);};
+default_space.ibor = cmacro (a, b) {(a)|=(b);};
+default_space.ixor = cmacro (a, b) {(a)^=(b);};
+default_space.getindex = cmacro (a, b) {((a)[(b)])};
+default_space.setindex = cmacro (a, b, c) {(a)[(b)]=(c);};
+default_space.get = cmacro (a, b) {((a).b)};
+default_space.set = cmacro (a, b, c) {(a).b=(c);};
+default_space.getp = cmacro (a, b) {((a)->b)};
+default_space.setp = cmacro (a, b, c) {(a)->b=(c);};
+default_space.ref = cmacro (a) {(&(a))};
+default_space.deref = cmacro (a) {(*(a))};
+
+@generic_space;
+def default_type(S, name, format = None) {
+    S.update(default_space);
+    if format {
+        S.format = format;
+    }
+    return CRaw(name);
+}
+
+cchar = default_type("char", cdefine "%c";);
+cuchar = default_type("unsigned char", cdefine "%d";);
+cshort = default_type("short", cdefine "%hi";);
+cushort = default_type("unsigned short", cdefine "%hu";);
+cint = default_type("int", cdefine "%d";);
+cuint = default_type("unsigned", cdefine "%du";);
+clong = default_type("long", cdefine "%ld";);
+culong = default_type("unsigned long", cdefine "%lu";);
+cllong = default_type("long long", cdefine "%lld";);
+cullong = default_type("unsigned long long", cdefine "%llu";);
+cfloat = default_type("float", cdefine "%f";);
+cdouble = default_type("double", cdefine "%lf";);
+cvoid = default_type("void", cdefine "%p";);

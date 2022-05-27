@@ -1,0 +1,63 @@
+from pycpre import *;
+
+stdio = cinclude<stdio.h>;
+stdlib = cinclude<stdlib.h>;
+
+@generic_space
+def Point(S, T){
+    S.len = cdef T(S p) {
+        T x = p.x;
+        T y = p.y;
+        return T.add(T.mul(x, x), T.mul(y, y));
+    }
+    S.add = cdef S(S a, S b) {
+        return (S){T.add(a.x, b.x), T.add(a.y, b.y)};
+    }
+    S.sub = cdef S(S a, S b) {
+        return (S){T.sub(a.x, b.x), T.sub(a.y, b.y)};
+    }
+    return cstruct {
+        T x;
+        T y;
+    }
+}
+
+@generic
+def new(T) {
+    return cdef T*() {
+        return stdlib.calloc(1, sizeof(T));
+    }
+}
+
+@generic
+def destroy(T) {
+    return cdef void(T* o) {
+        stdlib.free(o);
+    }
+}
+
+@generic
+def add(T, b) {
+    return cdef T(T a) {
+        return T.add(a, b);
+    }
+}
+
+numbers = [(lambda n: cdef cint() {return n;})(i) for i in range(10)];
+
+main = cdef cint() {
+    Point[cint]* a = new[Point[cint]]();
+    Point[cint] b = {1,2};
+    Point[cint] c = Point[cint].add(*a, b);
+    stdio.printf("Len: " cint.format "\n", Point[cint].len(c));
+    stdio.printf("2 + 3 = " cint.format "\n", add[cint, 2](3));
+    stdio.printf("2. + 3. = " cdouble.format "\n", add[cdouble, 2](3));
+    stdio.printf("3. + 5. = " cdouble.format "\n", add[cdouble, 3](numbers[5]()));
+    destroy[Point[cint]](a);
+    return 0;
+}
+
+print(Point[cint]);
+print(numbers[3]);
+
+build("example-generic", main=main);
