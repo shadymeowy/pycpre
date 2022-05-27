@@ -1,0 +1,10 @@
+from pycpre import *;
+
+stdio = cinclude<stdio.h>;
+
+main = cdef cint() {
+    stdio.printf("Hello World !\n");
+    return 0;
+}
+
+build("example-helloworld", main=main);
