@@ -1,0 +1,44 @@
+from pycpre import *;
+
+stdio = cinclude<stdio.h>;
+
+def apply_cfun(f) {
+    return cdef void(cint x[], cint n){
+        for(cint i = 0; i < n; i++) {
+            f(x[i]);
+        }
+    }
+}
+
+def map_cfun(f) {
+    return cdef void(cint x[], cint n){
+        for(cint i = 0; i < n; i++) {
+            x[i] = f(x[i]);
+        }
+    }
+}
+
+def add_n(n) {
+    return cdef cint(cint x){ 
+        return x + n;
+    }
+}
+
+add_two = add_n(2);
+map_add_two = map_cfun(add_two);
+
+print_int = cdef void(cint x){
+    stdio.printf("%d\n", x);
+}
+
+print_array = apply_cfun(print_int);
+
+main = cdef cint() {
+    cint x[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    print_array(x, 10);
+    map_add_two(x, 10);
+    print_array(x, 10);
+    return 0;
+}
+
+build("example-cobjects", main=main);
