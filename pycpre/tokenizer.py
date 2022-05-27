@@ -174,6 +174,7 @@ class Tokens():
             r.extend(arg)
         return r
 
+
 SYMBOL = Symbol()
 NUMBER = Number()
 STRING = String()
@@ -187,3 +188,9 @@ SEMICOLON = Special(";")
 DOT = Special(".")
 COMMA = Special(",")
 AT = Operator("@")
+
+__tokenizer = Tokenizer()
+
+
+def tokenize(s):
+    return __tokenizer.tokenize(s)

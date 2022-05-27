@@ -1,7 +1,7 @@
 import os
 import os.path
 import glob
-from .tokenizer import Tokenizer
+from .tokenizer import tokenize
 from .pycp_parser import PYCPParser, CurlyParser
 from .special import cdeps, cbuild, cdeps
 
@@ -71,12 +71,11 @@ def _curly_traverse(r, b, i):
 
 def process_file(path, cdef=True, curl=True):
     code = open(path, "r").read()
-    tokenizer = Tokenizer()
     if cdef:
-        tokens = tokenizer.tokenize(code)
+        tokens = tokenize(code)
         code = PYCPParser.parse(tokens, curl)
     if curl:
-        tokens = tokenizer.tokenize(code)
+        tokens = tokenize(code)
         code = CurlyParser.parse(tokens)
         code = _convert_curly(code)
     open(os.path.splitext(path)[0] + ".py", "w").write(code)

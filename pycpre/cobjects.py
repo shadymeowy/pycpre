@@ -1,4 +1,4 @@
-from .tokenizer import Tokenizer
+from .tokenizer import tokenize
 from .c_parser import CParser
 from .special import cembed, cbuild, cdeps
 
@@ -10,8 +10,7 @@ class CCode():
         self.globals = g
 
     def process(self):
-        tokenizer = Tokenizer()
-        tokens = tokenizer.tokenize(self.code)
+        tokens = tokenize(self.code)
         return CParser.parse(tokens, self.locals, self.globals)
 
 
