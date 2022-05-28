@@ -1,6 +1,7 @@
 from .baseparser import BaseParser
 from .tokenizer import SYMBOL, DOT, PARANS, PARANS2
 from .special import cembed, is_followable, is_embedable
+import sys
 
 MAGIC = "____PYCPRE_MAGIC____"
 
@@ -18,7 +19,7 @@ class CParser(BaseParser):
                 r.append(self.expr(o, l, g, code))
             else:
                 if not o is None:
-                    print(f"Warning: '{t}' exists in lexical scope but not followable: {o}")
+                    print(f"Warning: '{t}' exists in lexical scope but not followable: {o}", file=sys.stderr)
                 self.inc()
 
         fragments = []
@@ -29,7 +30,7 @@ class CParser(BaseParser):
                 fragments.append(cembed(o))
                 head = stop
             else:
-                print(f"Warning: '{code[start:stop]}' followed but is not embedable: {o}")
+                print(f"Warning: '{code[start:stop]}' followed but is not embedable: {o}", file=sys.stderr)
         fragments.append(code[head:-1])
         return "".join(fragments), [a[2] for a in r if hasattr(a[2], "__cembed__")]
 

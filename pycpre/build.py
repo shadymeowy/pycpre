@@ -1,5 +1,6 @@
 import os
 import os.path
+import sys
 import glob
 from .tokenizer import tokenize
 from .pycp_parser import PYCPParser, CurlyParser
@@ -83,5 +84,5 @@ def process_file(path, cdef=True, curl=True):
 
 def process_files(path):
     for p in set(glob.glob(os.path.join(path, "**", "**", "*.pycp"), recursive=True)):
-        print(p)
+        print(p, file=sys.stderr)
         process_file(p)
