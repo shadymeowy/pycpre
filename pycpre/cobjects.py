@@ -201,7 +201,7 @@ class CMacro():
             argst = self.args.process()
             bodyt = self.body.process()
             self.cache = build_template(
-                defs="#define {}({}) {}".format(self.label, argst[0], bodyt[0]))
+                defs="#define {}({}) {}".format(self.label, argst[0], bodyt[0].replace("\n", "\\\n")))
             self.deps.extend(argst[1])
             self.deps.extend(bodyt[1])
             
