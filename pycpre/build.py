@@ -32,9 +32,9 @@ def build(path=None, **kargs):
 
     result = []
     for a in r:
-        a = list(set(a))  # TODO
         for b in a:
-            result.append(b)
+            if b not in result:
+                result.append(b)
     result = "\n".join(result)
     if path != None:
         open(path + ".c", "w").write(result)  # join

@@ -34,7 +34,7 @@ class CFunction():
             self.deps.extend(rett[1])
             self.deps.extend(argst[1])
             self.deps.extend(bodyt[1])
-            self.deps = list(set(self.deps))
+            
         return self.cache
 
     def __cembed__(self):
@@ -106,7 +106,7 @@ class CGlobal():
                 glbs="{} {} = {};".format(rett[0], self.label, bodyt[0]))
             self.deps.extend(rett[1])
             self.deps.extend(bodyt[1])
-            self.deps = list(set(self.deps))
+            
         return self.cache
 
     def __cembed__(self):
@@ -128,7 +128,7 @@ class CReplace():
             bodyt = self.body.process()
             self.cache = bodyt[0]
             self.deps.extend(bodyt[1])
-            self.deps = list(set(self.deps))
+            
         return build_template()
 
     def __cembed__(self):
@@ -153,7 +153,7 @@ class CTypedef():
             self.cache = build_template(
                 ftypedef="typedef {} {};".format(bodyt[0], self.label))
             self.deps.extend(bodyt[1])
-            self.deps = list(set(self.deps))
+            
         return self.cache
 
     def __cembed__(self):
@@ -177,7 +177,7 @@ class CDefine():
             self.cache = build_template(
                 defs="#define {} {}".format(self.label, bodyt[0]))
             self.deps.extend(bodyt[1])
-            self.deps = list(set(self.deps))
+            
         return self.cache
 
     def __cembed__(self):
@@ -204,7 +204,7 @@ class CMacro():
                 defs="#define {}({}) {}".format(self.label, argst[0], bodyt[0]))
             self.deps.extend(argst[1])
             self.deps.extend(bodyt[1])
-            self.deps = list(set(self.deps))
+            
         return self.cache
 
     def __cembed__(self):
