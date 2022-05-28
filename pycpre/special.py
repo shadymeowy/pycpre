@@ -28,3 +28,25 @@ def cbuild(o):
         return list(cbuild(x) for x in o)
     else:
         return o.__cbuild__()
+
+def is_followable(o):
+    if o is None:
+        return False
+    elif hasattr(o, "__cembed__"):
+        return True
+    elif isinstance(o, int) or isinstance(o, float) or isinstance(o, str) or isinstance(o, list):
+        return True
+    elif hasattr(o, "__call__") or hasattr(o, "__getitem__"):
+        return True
+    else:
+        return False
+
+def is_embedable(o):
+    if o is None:
+        return False
+    elif isinstance(o, int) or isinstance(o, float) or isinstance(o, str):
+        return True
+    elif isinstance(o, list):
+        return all(is_embedable(x) for x in o)
+    else:
+        return hasattr(o, "__cembed__")
