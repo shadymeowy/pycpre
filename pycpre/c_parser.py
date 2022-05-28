@@ -1,6 +1,6 @@
 from .baseparser import BaseParser
 from .tokenizer import SYMBOL, DOT, PARANS, PARANS2
-from .special import cembed
+from .special import cembed, is_followable, is_embedable
 
 MAGIC = "____PYCPRE_MAGIC____"
 
@@ -11,25 +11,31 @@ class CParser(BaseParser):
         code = self.tokens.code
         while self.peeknm(None):
             t = self.peek().value
-            if t in l:
-                r.append(self.expr(l[t], l, g, code))
-            elif t in g:
-                r.append(self.expr(g[t], l, g, code))
-            elif hasattr(g["__builtins__"], t):
-                r.append(self.expr(getattr(g["__builtins__"], t), l, g, code))
+            o = getattr(g["__builtins__"], t) if hasattr(g["__builtins__"], t) else None
+            o = g[t] if t in g else o
+            o = l[t] if t in l else o
+            if is_followable(o):
+                r.append(self.expr(o, l, g, code))
             else:
+                if not o is None:
+                    print(f"Warning: '{t}' exists in lexical scope but not followable: {o}")
                 self.inc()
-        b = []
-        start = 0
-        for s in r:
-            b.append(code[start:s[0]])
-            b.append(cembed(s[2]))
-            start = s[1]
-        b.append(code[start:-1])
-        return "".join(b), [a[2] for a in r]
+
+        fragments = []
+        head = 0
+        for start, stop, o in r:
+            if is_embedable(o):
+                fragments.append(code[head:start])
+                fragments.append(cembed(o))
+                head = stop
+            else:
+                print(f"Warning: '{code[start:stop]}' followed but is not embedable: {o}")
+        fragments.append(code[head:-1])
+        return "".join(fragments), [a[2] for a in r if hasattr(a[2], "__cembed__")]
 
     def expr(self, curr, l, g, code):
         start = self.read().start
+
         while self.peeknm(None):
             if self.peekim(DOT):
                 if self.peekm(SYMBOL):
