@@ -70,8 +70,8 @@ def _curly_traverse(r, b, i):
             _curly_traverse(a[1], b, i + 1)
 
 
-def process_file(path, cdef=True, curl=True):
-    code = open(path, "r").read()
+def process_file(file, output, cdef=True, curl=True, auto_import=True):
+    code = open(file, "r").read()
     if cdef:
         tokens = tokenize(code)
         code = PYCPParser.parse(tokens, curl)
@@ -79,10 +79,7 @@ def process_file(path, cdef=True, curl=True):
         tokens = tokenize(code)
         code = CurlyParser.parse(tokens)
         code = _convert_curly(code)
-    open(os.path.splitext(path)[0] + ".py", "w").write(code)
-
-
-def process_files(path):
-    for p in set(glob.glob(os.path.join(path, "**", "**", "*.pycp"), recursive=True)):
-        print(p, file=sys.stderr)
-        process_file(p)
+    with open(output, "w") as f:
+        if auto_import:
+            f.write("from pycpre import *\n")
+        f.write(code)
