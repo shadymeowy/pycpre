@@ -1,10 +1,8 @@
-from pycpre import *;
-
 stdio = cinclude<stdio.h>;
 stdlib = cinclude<stdlib.h>;
 
 @generic_space
-def Point(S, T){
+def Point(S, T) {
     S.len = cdef T(S p) {
         T x = p.x;
         T y = p.y;

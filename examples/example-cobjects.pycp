@@ -1,9 +1,7 @@
-from pycpre import *;
-
 stdio = cinclude<stdio.h>;
 
 def apply_cfun(f) {
-    return cdef void(cint x[], cint n){
+    return cdef void(cint x[], cint n) {
         for(cint i = 0; i < n; i++) {
             f(x[i]);
         }
@@ -11,7 +9,7 @@ def apply_cfun(f) {
 }
 
 def map_cfun(f) {
-    return cdef void(cint x[], cint n){
+    return cdef void(cint x[], cint n) {
         for(cint i = 0; i < n; i++) {
             x[i] = f(x[i]);
         }
@@ -19,7 +17,7 @@ def map_cfun(f) {
 }
 
 def add_n(n) {
-    return cdef cint(cint x){ 
+    return cdef cint(cint x) { 
         return x + n;
     }
 }

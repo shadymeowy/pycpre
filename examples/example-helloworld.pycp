@@ -1,5 +1,3 @@
-from pycpre import *;
-
 stdio = cinclude<stdio.h>;
 
 main = cdef cint() {
