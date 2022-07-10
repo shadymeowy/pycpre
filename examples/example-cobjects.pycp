@@ -39,4 +39,4 @@ main = cdef cint() {
     return 0;
 }
 
-build("example-cobjects", main=main);
+build("example-cobjects.c", main=main);
