@@ -1,13 +1,9 @@
-import os
-import os.path
-import sys
-import glob
 from .tokenizer import tokenize
 from .pycp_parser import PYCPParser, CurlyParser
 from .special import cdeps, cbuild, cdeps
 
 
-def build(path=None, **kargs):
+def build(path=None, format=False, format_args=["-i"], formatter=None, **kargs):
     q = []
     for k, v in kargs.items():
         v.label = k
@@ -38,7 +34,12 @@ def build(path=None, **kargs):
                 result.append(b)
     result = "\n".join(result)
     if path != None:
-        open(path + ".c", "w").write(result)  # join
+        open(path, "w").write(result)  # join
+    if format:
+        import subprocess
+        if formatter is None:
+            formatter = "clang-format"
+        subprocess.call(["clang-format", path, *format_args])
     return result
 
 
