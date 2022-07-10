@@ -1,6 +1,6 @@
 stdio = cinclude<stdio.h>;
 
-import random
+import random;
 
 main = cdef cint() {
     stdio.printf("Totally random guess the number !\n");
