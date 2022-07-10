@@ -36,7 +36,7 @@ def is_followable(o):
         return True
     elif isinstance(o, int) or isinstance(o, float) or isinstance(o, str) or isinstance(o, list):
         return True
-    elif hasattr(o, "__call__") or hasattr(o, "__getitem__"):
+    elif hasattr(o, "__call__") or hasattr(o, "__getitem__") or hasattr(o, "__getattr__") or hasattr(o, "__getattribute__"):
         return True
     else:
         return False
