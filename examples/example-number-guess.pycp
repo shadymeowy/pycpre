@@ -1,0 +1,23 @@
+stdio = cinclude<stdio.h>;
+
+import random
+
+main = cdef cint() {
+    stdio.printf("Totally random guess the number !\n");
+    cint guess;
+    cint number = random.randint(1, 10);
+
+    stdio.printf("Guess a number between 1 and 10: ");
+    stdio.scanf("%d", &guess);
+    stdio.printf("You guessed: %d\n", guess);
+    stdio.printf("The number was: %d\n", number);
+
+    if (guess == number) {
+        stdio.printf("You guessed correctly !\n");
+    } else {
+        stdio.printf("You guessed incorrectly !\n");
+    }
+    return 0;
+}
+
+build("example-number-guess.c", main=main);
