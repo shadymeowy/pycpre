@@ -2,7 +2,7 @@ def cembed(o):
     if isinstance(o, int) or isinstance(o, float):
         return str(o)
     elif isinstance(o, str):
-        return "\"{}\"".format(o)
+        return "\"{}\"".format(repr(o)[1:-1])
     elif isinstance(o, list):
         return "{{{}}}".format(", ".join(cembed(x) for x in o))
     else:
