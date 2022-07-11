@@ -56,18 +56,46 @@ def default_type(S, name, format = None) {
     return CRaw(name);
 }
 
-cchar = default_type("char", cdefine "%c";);
-cuchar = default_type("unsigned char", cdefine "%d";);
-cshort = default_type("short", cdefine "%hi";);
-cushort = default_type("unsigned short", cdefine "%hu";);
-cint = default_type("int", cdefine "%d";);
-cuint = default_type("unsigned", cdefine "%du";);
-clong = default_type("long", cdefine "%ld";);
-culong = default_type("unsigned long", cdefine "%lu";);
-cllong = default_type("long long", cdefine "%lld";);
-cullong = default_type("unsigned long long", cdefine "%llu";);
-cfloat = default_type("float", cdefine "%f";);
-cdouble = default_type("double", cdefine "%lf";);
-cvoid = default_type("void", cdefine "%p";);
+cchar = default_type("char", cdefine("%c"));
+cuchar = default_type("unsigned char", cdefine("%d"));
+cshort = default_type("short", cdefine("%hi"));
+cushort = default_type("unsigned short", cdefine("%hu"));
+cint = default_type("int", cdefine("%d"));
+cuint = default_type("unsigned", cdefine("%du"));
+clong = default_type("long", cdefine("%ld"));
+culong = default_type("unsigned long", cdefine("%lu"));
+cllong = default_type("long long", cdefine("%lld"));
+cullong = default_type("unsigned long long", cdefine("%llu"));
+cfloat = default_type("float", cdefine("%f"));
+cdouble = default_type("double", cdefine("%lf"));
+cvoid = default_type("void", cdefine("%p"));
 
 C = CDummySpace();
+
+def Pointer(T) {
+    return ctypedef(T*);
+}
+
+def Array(T, N) {
+    return carraydef T[N];
+}
+
+def Include(path) {
+    return cinclude(path);
+}
+
+def Global(T, value) {
+    return cglobal T(value);
+}
+
+def Typedef(T) {
+    return ctypedef(T);
+}
+
+def Define(value) {
+    return cdefine(value);
+}
+
+def FunctionPtr(R, T) {
+    return cfundef R(tuple(T));
+}

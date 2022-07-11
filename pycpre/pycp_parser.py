@@ -1,4 +1,4 @@
-from .tokenizer import Symbol, PARANS, CPARANS, SEMICOLON, AT, TO
+from .tokenizer import Symbol, PARANS, PARANS2, CPARANS, SEMICOLON, AT, TO
 from .baseparser import BaseParser
 
 template_strings = [
@@ -11,6 +11,7 @@ template_strings = [
     'cdefine(locals(), globals(), {})',
     'cmacro(locals(), globals(), {}, {})',
     'cfundef(locals(), globals(), {}, {})',
+    'carraydef(locals(), globals(), {}, {})',
     '{} = cdef(locals(), globals(), {}, {}, {})',
 ]
 template_strings_semicolon = template_strings.copy()
@@ -53,8 +54,8 @@ class PYCPParser(BaseParser):
                 )))
             elif self.peekim(Symbol("cglobal")):
                 start = self.last().start
-                typ = self.readnwhile(CPARANS[0])
-                body = self.readrawparans(CPARANS)
+                typ = self.readnwhile(PARANS[0])
+                body = self.readrawparans(PARANS)
                 stop = self.last().stop
                 r.append((start, stop, f[3].format(
                     code[typ[0].start:typ[-1].stop].encode() if typ else b"",
@@ -62,7 +63,10 @@ class PYCPParser(BaseParser):
                 )))
             elif self.peekim(Symbol("creplace")):
                 start = self.last().start
-                body = self.readrawparans(CPARANS)
+                if self.peekm(CPARANS[0]):
+                    body = self.readrawparans(CPARANS)
+                else:
+                    body = self.readrawparans(PARANS)
                 stop = self.last().stop
                 r.append((start, stop, f[4].format(
                     code[body[0].start:body[-1].stop].encode() if body else b""
@@ -105,6 +109,15 @@ class PYCPParser(BaseParser):
                     code[ret[0].start:ret[-1].stop].encode() if ret else b"",
                     code[params[0].start:params[-1].stop].encode() if params else b""
                 )))
+            elif self.peekim(Symbol("carraydef")):
+                start = self.last().start
+                typ = self.readnwhile(PARANS2[0])
+                size = self.readrawparans(PARANS2)
+                stop = self.last().stop
+                r.append((start, stop, f[9].format(
+                    code[typ[0].start:typ[-1].stop].encode() if typ else b"",
+                    code[size[0].start:size[-1].stop].encode() if size else b""
+                )))
             elif self.peekim(Symbol("cdef")):
                 start = self.last().start
                 ret = self.readnwhile(PARANS[0])
@@ -116,7 +129,7 @@ class PYCPParser(BaseParser):
                     ret = self.readnwhile(CPARANS[0])
                 body = self.readrawparans(CPARANS)
                 stop = self.last().stop
-                r.append((start, stop, f[9].format(
+                r.append((start, stop, f[10].format(
                     code[name.start:name.stop] if ret else b"",
                     code[ret[0].start:ret[-1].stop].encode() if ret else b"",
                     code[params[0].start:params[-1].stop].encode() if params else b"",

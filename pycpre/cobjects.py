@@ -197,6 +197,23 @@ class CFunctionTypedef(CLabelledObject):
 
         return self.cache
 
+class CArrayTypedef(CLabelledObject):
+    def __init__(self, l, g, typ, size):
+        self.typ = CFragment(l, g, typ)
+        self.size = CFragment(l, g, size)
+        super().__init__()
+
+    def __cbuild__(self):
+        if self.cache == None:
+            typt = self.typ.process()
+            sizet = self.size.process()
+            self.cache = build_template(
+                ftypedef="typedef {} {}[{}];".format(typt[0], self.label, sizet[0]))
+            self.deps.extend(typt[1])
+            self.deps.extend(sizet[1])
+
+        return self.cache
+
 
 class CRaw(CObject):
     def __init__(self, value):
@@ -260,6 +277,8 @@ def cmacro(l, g, a, b):
 def cfundef(l, g, r, a):
     return CFunctionTypedef(l, g, r.decode(), a.decode())
 
+def carraydef(l, g, r, a):
+    return CArrayTypedef(l, g, r.decode(), a.decode())
 
 def cdef(l, g, r, a, b):
     return CFunction(l, g, r.decode(), a.decode(), b.decode())
