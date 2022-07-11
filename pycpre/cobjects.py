@@ -34,7 +34,7 @@ class CFunction():
             self.deps.extend(rett[1])
             self.deps.extend(argst[1])
             self.deps.extend(bodyt[1])
-            
+
         return self.cache
 
     def __cembed__(self):
@@ -106,7 +106,7 @@ class CGlobal():
                 glbs="{} {} = {};".format(rett[0], self.label, bodyt[0]))
             self.deps.extend(rett[1])
             self.deps.extend(bodyt[1])
-            
+
         return self.cache
 
     def __cembed__(self):
@@ -128,7 +128,7 @@ class CReplace():
             bodyt = self.body.process()
             self.cache = bodyt[0]
             self.deps.extend(bodyt[1])
-            
+
         return build_template()
 
     def __cembed__(self):
@@ -153,7 +153,7 @@ class CTypedef():
             self.cache = build_template(
                 ftypedef="typedef {} {};".format(bodyt[0], self.label))
             self.deps.extend(bodyt[1])
-            
+
         return self.cache
 
     def __cembed__(self):
@@ -177,7 +177,7 @@ class CDefine():
             self.cache = build_template(
                 defs="#define {} {}".format(self.label, bodyt[0]))
             self.deps.extend(bodyt[1])
-            
+
         return self.cache
 
     def __cembed__(self):
@@ -204,7 +204,34 @@ class CMacro():
                 defs="#define {}({}) {}".format(self.label, argst[0], bodyt[0].replace("\n", "\\\n")))
             self.deps.extend(argst[1])
             self.deps.extend(bodyt[1])
-            
+
+        return self.cache
+
+    def __cembed__(self):
+        return self.label
+
+    def __cdeps__(self):
+        self.__cbuild__()
+        return self.deps
+
+
+class CFunctionTypedef():
+    def __init__(self, l, g, ret, args):
+        self.ret = CCode(l, g, ret)
+        self.args = CCode(l, g, args)
+        self.label = label()
+        self.cache = None
+        self.deps = []
+
+    def __cbuild__(self):
+        if self.cache == None:
+            rett = self.ret.process()
+            argst = self.args.process()
+            self.cache = build_template(
+                ftypedef="typedef {} (*{})({});".format(rett[0], self.label, argst[0]))
+            self.deps.extend(rett[1])
+            self.deps.extend(argst[1])
+
         return self.cache
 
     def __cembed__(self):
@@ -294,6 +321,10 @@ def cdefine(l, g, b):
 
 def cmacro(l, g, a, b):
     return CMacro(l, g, a.decode(), b.decode())
+
+
+def cfundef(l, g, r, a):
+    return CFunctionTypedef(l, g, r.decode(), a.decode())
 
 
 label_count = -1

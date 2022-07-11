@@ -10,6 +10,7 @@ template_strings = [
     'ctypedef(locals(), globals(), {})',
     'cdefine(locals(), globals(), {})',
     'cmacro(locals(), globals(), {}, {})',
+    'cfundef(locals(), globals(), {}, {})',
 ]
 template_strings_semicolon = list(map(lambda x: x + ";", template_strings))
 
@@ -86,6 +87,15 @@ class PYCPParser(BaseParser):
                 r.append((start, stop, f[7].format(
                     code[params[0].start:params[-1].stop].encode() if params else b"",
                     code[body[0].start:body[-1].stop].encode() if body else b""
+                )))
+            elif self.peekim(Symbol("cfundef")):
+                start = self.last().start
+                typ = self.readnwhile(PARANS[0])
+                params = self.readrawparans(PARANS)
+                stop = self.last().stop
+                r.append((start, stop, f[8].format(
+                    code[typ[0].start:typ[-1].stop].encode() if typ else b"",
+                    code[params[0].start:params[-1].stop].encode() if params else b""
                 )))
             else:
                 self.inc()
