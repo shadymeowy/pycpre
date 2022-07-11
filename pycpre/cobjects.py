@@ -5,7 +5,6 @@ from .special import cembed, cbuild, cdeps
 
 class CObject():
     def __init__(self):
-        self.label = label()
         self.cache = None
         self.deps = []
 
@@ -20,6 +19,15 @@ class CObject():
         return self.deps
 
 
+class CLabelledObject(CObject):
+    def __init__(self):
+        super().__init__()
+        self.label = label()
+
+    def __cembed__(self):
+        return self.label
+
+
 class CFragment:
     def __init__(self, l, g, code):
         self.code = code
@@ -31,7 +39,7 @@ class CFragment:
         return CParser.parse(tokens, self.locals, self.globals)
 
 
-class CFunction(CObject):
+class CFunction(CLabelledObject):
     def __init__(self, l, g, ret, args, body):
         self.ret = CFragment(l, g, ret)
         self.args = CFragment(l, g, args)
@@ -53,7 +61,7 @@ class CFunction(CObject):
         return self.cache
 
 
-class CStruct(CObject):
+class CStruct(CLabelledObject):
     def __init__(self, l, g, body):
         self.body = CFragment(l, g, body)
         super().__init__()
@@ -84,7 +92,7 @@ class CInclude(CObject):
         return True
 
 
-class CGlobal(CObject):
+class CGlobal(CLabelledObject):
     def __init__(self, l, g, ret, body):
         self.ret = CFragment(l, g, ret)
         self.body = CFragment(l, g, body)
@@ -124,7 +132,7 @@ class CReplace(CObject):
         return self.deps
 
 
-class CTypedef(CObject):
+class CTypedef(CLabelledObject):
     def __init__(self, l, g, body):
         self.body = CFragment(l, g, body)
         super().__init__()
@@ -139,7 +147,7 @@ class CTypedef(CObject):
         return self.cache
 
 
-class CDefine(CObject):
+class CDefine(CLabelledObject):
     def __init__(self, l, g, body):
         self.body = CFragment(l, g, body)
         super().__init__()
@@ -154,7 +162,7 @@ class CDefine(CObject):
         return self.cache
 
 
-class CMacro(CObject):
+class CMacro(CLabelledObject):
     def __init__(self, l, g, args, body):
         self.args = CFragment(l, g, args)
         self.body = CFragment(l, g, body)
@@ -172,7 +180,7 @@ class CMacro(CObject):
         return self.cache
 
 
-class CFunctionTypedef(CObject):
+class CFunctionTypedef(CLabelledObject):
     def __init__(self, l, g, ret, args):
         self.ret = CFragment(l, g, ret)
         self.args = CFragment(l, g, args)
@@ -205,9 +213,6 @@ class CDummySpace(CObject):
 
     def __hasattr__(self, value):
         return True
-
-
-C = CDummySpace()
 
 
 class CRawDepend(CObject):
@@ -267,3 +272,5 @@ def label():
 
 def build_template(defs=None, includes=None, sdec=None, ftypedef=None, simp=None, stypedef=None, fdec=None, glbs=None, fimp=None):
     return [defs, includes, sdec, ftypedef, simp, stypedef, fdec, glbs, fimp]
+
+C = CDummySpace()
