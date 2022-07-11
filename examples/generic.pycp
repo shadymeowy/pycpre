@@ -55,4 +55,4 @@ main = cdef cint() {
     return 0;
 }
 
-build("example-generic.c", main=main);
+build("generic.c", main=main);
