@@ -3,7 +3,24 @@ from .c_parser import CParser
 from .special import cembed, cbuild, cdeps
 
 
-class CCode():
+class CObject():
+    def __init__(self):
+        self.label = label()
+        self.cache = None
+        self.deps = []
+
+    def __cembed__(self):
+        raise NotImplementedError()
+
+    def __cbuild__(self):
+        return build_template()
+
+    def __cdeps__(self):
+        self.__cbuild__()
+        return self.deps
+
+
+class CFragment:
     def __init__(self, l, g, code):
         self.code = code
         self.locals = l
@@ -14,14 +31,12 @@ class CCode():
         return CParser.parse(tokens, self.locals, self.globals)
 
 
-class CFunction():
+class CFunction(CObject):
     def __init__(self, l, g, ret, args, body):
-        self.ret = CCode(l, g, ret)
-        self.args = CCode(l, g, args)
-        self.body = CCode(l, g, body)
-        self.label = label()
-        self.cache = None
-        self.deps = []
+        self.ret = CFragment(l, g, ret)
+        self.args = CFragment(l, g, args)
+        self.body = CFragment(l, g, body)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -37,20 +52,11 @@ class CFunction():
 
         return self.cache
 
-    def __cembed__(self):
-        return self.label
 
-    def __cdeps__(self):
-        self.__cbuild__()
-        return self.deps
-
-
-class CStruct():
+class CStruct(CObject):
     def __init__(self, l, g, body):
-        self.body = CCode(l, g, body)
-        self.label = label()
-        self.cache = None
-        self.deps = []
+        self.body = CFragment(l, g, body)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -62,26 +68,14 @@ class CStruct():
             self.deps.extend(bodyt[1])
         return self.cache
 
-    def __cembed__(self):
-        return self.label
 
-    def __cdeps__(self):
-        self.__cbuild__()
-        return self.deps
-
-
-class CInclude():
+class CInclude(CObject):
     def __init__(self, value):
         self.value = value
-
-    def __cembed__(self):
-        raise Exception()
+        super().__init__()
 
     def __cbuild__(self):
         return build_template(includes="#include {}".format(self.value))
-
-    def __cdeps__(self):
-        return []
 
     def __getattr__(self, value):
         return CRawDepend(value, [self])
@@ -90,13 +84,11 @@ class CInclude():
         return True
 
 
-class CGlobal():
+class CGlobal(CObject):
     def __init__(self, l, g, ret, body):
-        self.ret = CCode(l, g, ret)
-        self.body = CCode(l, g, body)
-        self.label = label()
-        self.cache = None
-        self.deps = []
+        self.ret = CFragment(l, g, ret)
+        self.body = CFragment(l, g, body)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -109,19 +101,11 @@ class CGlobal():
 
         return self.cache
 
-    def __cembed__(self):
-        return self.label
 
-    def __cdeps__(self):
-        self.__cbuild__()
-        return self.deps
-
-
-class CReplace():
+class CReplace(CObject):
     def __init__(self, l, g, body):
-        self.body = CCode(l, g, body)
-        self.cache = None
-        self.deps = []
+        self.body = CFragment(l, g, body)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -140,12 +124,10 @@ class CReplace():
         return self.deps
 
 
-class CTypedef():
+class CTypedef(CObject):
     def __init__(self, l, g, body):
-        self.body = CCode(l, g, body)
-        self.label = label()
-        self.cache = None
-        self.deps = []
+        self.body = CFragment(l, g, body)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -156,20 +138,11 @@ class CTypedef():
 
         return self.cache
 
-    def __cembed__(self):
-        return self.label
 
-    def __cdeps__(self):
-        self.__cbuild__()
-        return self.deps
-
-
-class CDefine():
+class CDefine(CObject):
     def __init__(self, l, g, body):
-        self.body = CCode(l, g, body)
-        self.label = label()
-        self.cache = None
-        self.deps = []
+        self.body = CFragment(l, g, body)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -180,21 +153,12 @@ class CDefine():
 
         return self.cache
 
-    def __cembed__(self):
-        return self.label
 
-    def __cdeps__(self):
-        self.__cbuild__()
-        return self.deps
-
-
-class CMacro():
+class CMacro(CObject):
     def __init__(self, l, g, args, body):
-        self.args = CCode(l, g, args)
-        self.body = CCode(l, g, body)
-        self.label = label()
-        self.cache = None
-        self.deps = []
+        self.args = CFragment(l, g, args)
+        self.body = CFragment(l, g, body)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -207,21 +171,12 @@ class CMacro():
 
         return self.cache
 
-    def __cembed__(self):
-        return self.label
 
-    def __cdeps__(self):
-        self.__cbuild__()
-        return self.deps
-
-
-class CFunctionTypedef():
+class CFunctionTypedef(CObject):
     def __init__(self, l, g, ret, args):
-        self.ret = CCode(l, g, ret)
-        self.args = CCode(l, g, args)
-        self.label = label()
-        self.cache = None
-        self.deps = []
+        self.ret = CFragment(l, g, ret)
+        self.args = CFragment(l, g, args)
+        super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
@@ -234,38 +189,17 @@ class CFunctionTypedef():
 
         return self.cache
 
-    def __cembed__(self):
-        return self.label
 
-    def __cdeps__(self):
-        self.__cbuild__()
-        return self.deps
-
-
-class CRaw():
+class CRaw(CObject):
     def __init__(self, value):
         self.value = value
+        super().__init__()
 
     def __cembed__(self):
         return self.value
 
-    def __cbuild__(self):
-        return build_template()
 
-    def __cdeps__(self):
-        return []
-
-
-class CDummySpace():
-    def __cembed__(self):
-        raise Exception()
-
-    def __cbuild__(self):
-        return build_template()
-
-    def __cdeps__(self):
-        return []
-
+class CDummySpace(CObject):
     def __getattr__(self, value):
         return CRaw(value)
 
@@ -276,19 +210,14 @@ class CDummySpace():
 C = CDummySpace()
 
 
-class CRawDepend():
+class CRawDepend(CObject):
     def __init__(self, value, deps):
         self.value = value
+        super().__init__()
         self.deps = deps
 
     def __cembed__(self):
         return self.value
-
-    def __cbuild__(self):
-        return build_template()
-
-    def __cdeps__(self):
-        return self.deps
 
 
 def cdef(l, g, r, a, b):
