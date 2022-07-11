@@ -23,7 +23,7 @@ def cdeps(o):
         or isinstance(o, str)
         or isinstance(o, bytes)
         or isinstance(o, bytearray)
-        or isinstance(o, bool)):
+            or isinstance(o, bool)):
         return []
     elif isinstance(o, list) or isinstance(o, tuple):
         r = []
@@ -40,8 +40,8 @@ def cbuild(o):
         or isinstance(o, str)
         or isinstance(o, bytes)
         or isinstance(o, bytearray)
-        or isinstance(o, bool)):
-        return None
+            or isinstance(o, bool)):
+        return build_template()
     elif isinstance(o, list) or isinstance(o, tuple):
         return list(zip(*(cbuild(x) for x in o)))
     else:
@@ -54,11 +54,11 @@ def is_followable(o):
     elif hasattr(o, "__cembed__"):
         return True
     elif (isinstance(o, int)
-        or isinstance(o, float)
-        or isinstance(o, str)
-        or isinstance(o, bytes)
-        or isinstance(o, bytearray)
-        or isinstance(o, bool)):
+          or isinstance(o, float)
+          or isinstance(o, str)
+          or isinstance(o, bytes)
+          or isinstance(o, bytearray)
+          or isinstance(o, bool)):
         return True
     elif hasattr(o, "__call__") or hasattr(o, "__getitem__") or hasattr(o, "__getattr__") or hasattr(o, "__getattribute__"):
         return True
@@ -70,13 +70,17 @@ def is_embedable(o):
     if o is None:
         return False
     elif (isinstance(o, int)
-        or isinstance(o, float)
-        or isinstance(o, str)
-        or isinstance(o, bytes)
-        or isinstance(o, bytearray)
-        or isinstance(o, bool)):
+          or isinstance(o, float)
+          or isinstance(o, str)
+          or isinstance(o, bytes)
+          or isinstance(o, bytearray)
+          or isinstance(o, bool)):
         return True
     elif isinstance(o, list) or isinstance(o, tuple):
         return all(is_embedable(x) for x in o)
     else:
         return hasattr(o, "__cembed__")
+
+
+def build_template(defs=None, includes=None, sdec=None, ftypedef=None, simp=None, stypedef=None, fdec=None, glbs=None, fimp=None):
+    return [defs, includes, sdec, ftypedef, simp, stypedef, fdec, glbs, fimp]

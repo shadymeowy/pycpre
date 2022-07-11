@@ -1,6 +1,6 @@
 from .tokenizer import tokenize
 from .c_parser import CParser
-from .special import cembed, cbuild, cdeps
+from .special import build_template
 
 
 class CObject():
@@ -197,6 +197,7 @@ class CFunctionTypedef(CLabelledObject):
 
         return self.cache
 
+
 class CArrayTypedef(CLabelledObject):
     def __init__(self, l, g, typ, size):
         self.typ = CFragment(l, g, typ)
@@ -277,8 +278,10 @@ def cmacro(l, g, a, b):
 def cfundef(l, g, r, a):
     return CFunctionTypedef(l, g, r.decode(), a.decode())
 
+
 def carraydef(l, g, r, a):
     return CArrayTypedef(l, g, r.decode(), a.decode())
+
 
 def cdef(l, g, r, a, b):
     return CFunction(l, g, r.decode(), a.decode(), b.decode())
@@ -291,7 +294,3 @@ def label():
     global label_count
     label_count += 1
     return "label{}".format(label_count)
-
-
-def build_template(defs=None, includes=None, sdec=None, ftypedef=None, simp=None, stypedef=None, fdec=None, glbs=None, fimp=None):
-    return [defs, includes, sdec, ftypedef, simp, stypedef, fdec, glbs, fimp]
