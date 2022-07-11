@@ -29,7 +29,7 @@ def build(path=None, format=False, format_args=["-i"], formatter=None, **kargs):
 
     result = []
     for a in r:
-        for b in a:
+        for b in reversed(a):
             if b not in result:
                 result.append(b)
     result = "\n".join(result)
