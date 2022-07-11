@@ -72,30 +72,37 @@ cvoid = default_type("void", cdefine("%p"));
 
 C = CDummySpace();
 
+@generic
 def Pointer(T) {
     return ctypedef(T*);
 }
 
+@generic
 def Array(T, N) {
     return carraydef T[N];
 }
 
+@generic
 def Include(path) {
     return cinclude(path);
 }
 
+@generic
 def Global(T, value) {
     return cglobal T(value);
 }
 
+@generic
 def Typedef(T) {
     return ctypedef(T);
 }
 
+@generic
 def Define(value) {
     return cdefine(value);
 }
 
+@generic
 def FunctionPtr(R, T) {
     return cfundef R(tuple(T));
 }

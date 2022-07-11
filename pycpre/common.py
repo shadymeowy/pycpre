@@ -65,17 +65,24 @@ cfloat = default_type("float", cdefine(locals(), globals(), b'"%f"'))
 cdouble = default_type("double", cdefine(locals(), globals(), b'"%lf"'))
 cvoid = default_type("void", cdefine(locals(), globals(), b'"%p"'))
 C = CDummySpace()
+@generic
 def Pointer(T):
     return ctypedef(locals(), globals(), b'T*')
+@generic
 def Array(T, N):
     return carraydef(locals(), globals(), b'T', b'N')
+@generic
 def Include(path):
     return cinclude(locals(), globals(), b'path')
+@generic
 def Global(T, value):
     return cglobal(locals(), globals(), b'T', b'value')
+@generic
 def Typedef(T):
     return ctypedef(locals(), globals(), b'T')
+@generic
 def Define(value):
     return cdefine(locals(), globals(), b'value')
+@generic
 def FunctionPtr(R, T):
     return cfundef(locals(), globals(), b'R', b'tuple(T)')
