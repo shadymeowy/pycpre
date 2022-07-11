@@ -32,7 +32,7 @@ class CParser(BaseParser):
             else:
                 print(f"Warning: '{code[start:stop]}' followed but is not embedable: {o}", file=sys.stderr)
         fragments.append(code[head:-1])
-        return "".join(fragments), [a[2] for a in r if hasattr(a[2], "__cembed__")]
+        return "".join(fragments), [a[2] for a in r if is_embedable(a[2])]
 
     def expr(self, curr, l, g, code):
         start = self.read().start

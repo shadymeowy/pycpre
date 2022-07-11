@@ -11,6 +11,8 @@ def cembed(o):
         return "{{{}}}".format(", ".join(["0x{:02x}".format(x) for x in o]))
     elif isinstance(o, list):
         return "{{{}}}".format(", ".join(cembed(x) for x in o))
+    elif isinstance(o, tuple):
+        return ", ".join(cembed(x) for x in o)
     else:
         return o.__cembed__()
 
@@ -23,11 +25,11 @@ def cdeps(o):
         or isinstance(o, bytearray)
         or isinstance(o, bool)):
         return []
-    elif isinstance(o, list):
+    elif isinstance(o, list) or isinstance(o, tuple):
         r = []
         for x in o:
             r.extend(cdeps(x))
-        return list(r)
+        return r
     else:
         return o.__cdeps__()
 
@@ -40,8 +42,8 @@ def cbuild(o):
         or isinstance(o, bytearray)
         or isinstance(o, bool)):
         return None
-    elif isinstance(o, list):
-        return list(cbuild(x) for x in o)
+    elif isinstance(o, list) or isinstance(o, tuple):
+        return list(zip(*(cbuild(x) for x in o)))
     else:
         return o.__cbuild__()
 
@@ -74,7 +76,7 @@ def is_embedable(o):
         or isinstance(o, bytearray)
         or isinstance(o, bool)):
         return True
-    elif isinstance(o, list):
+    elif isinstance(o, list) or isinstance(o, tuple):
         return all(is_embedable(x) for x in o)
     else:
         return hasattr(o, "__cembed__")

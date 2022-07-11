@@ -14,18 +14,23 @@ def build(path=None, format=False, format_args=["-i"], formatter=None, **kargs):
         if not dep in deps:
             deps.append(dep)
             q.extend(cdeps(dep))
-
+    
     r = []
     for dep in deps:
-        dep = cbuild(dep)
-        if dep == None:
+        fragments = cbuild(dep)
+        if fragments == None:
             continue
-        for i in range(len(dep)):
+        for i in range(len(fragments)):
             if i >= len(r):  # TODO
                 r.append([])
-            b = dep[i]
+            b = fragments[i]
             if b != None:
-                r[i].append(b)
+                if isinstance(b, list) or isinstance(b, tuple):
+                    for f in b:
+                        if f != None:
+                            r[i].append(f)
+                else:
+                    r[i].append(b)
 
     result = []
     for a in r:
