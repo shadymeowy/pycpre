@@ -225,7 +225,7 @@ class CRawDepend(CObject):
         return self.value
 
 
-def cdef(l, g, r, a, b):
+def cfunction(l, g, r, a, b):
     return CFunction(l, g, r.decode(), a.decode(), b.decode())
 
 
@@ -259,6 +259,10 @@ def cmacro(l, g, a, b):
 
 def cfundef(l, g, r, a):
     return CFunctionTypedef(l, g, r.decode(), a.decode())
+
+
+def cdef(l, g, r, a, b):
+    return CFunction(l, g, r.decode(), a.decode(), b.decode())
 
 
 label_count = -1

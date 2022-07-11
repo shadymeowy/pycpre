@@ -1,8 +1,8 @@
-from .tokenizer import Symbol, PARANS, CPARANS, SEMICOLON, AT
+from .tokenizer import Symbol, PARANS, CPARANS, SEMICOLON, AT, TO
 from .baseparser import BaseParser
 
 template_strings = [
-    'cdef(locals(), globals(), {}, {}, {})',
+    'cfunction(locals(), globals(), {}, {}, {})',
     'cstruct(locals(), globals(), {})',
     'cinclude(locals(), globals(), {})',
     'cglobal(locals(), globals(), {}, {})',
@@ -11,8 +11,10 @@ template_strings = [
     'cdefine(locals(), globals(), {})',
     'cmacro(locals(), globals(), {}, {})',
     'cfundef(locals(), globals(), {}, {})',
+    '{} = cdef(locals(), globals(), {}, {}, {})',
 ]
-template_strings_semicolon = list(map(lambda x: x + ";", template_strings))
+template_strings_semicolon = template_strings.copy()
+template_strings_semicolon[-1] += ';'
 
 
 class PYCPParser(BaseParser):
@@ -21,14 +23,14 @@ class PYCPParser(BaseParser):
         r = []
         code = self.tokens.code
         while self.peeknm(None):
-            if self.peekim(Symbol("cdef")):
+            if self.peekim(Symbol("cfunction")):
                 start = self.last().start
-                typ = self.readnwhile(PARANS[0])
+                ret = self.readnwhile(PARANS[0])
                 params = self.readrawparans(PARANS)
                 body = self.readrawparans(CPARANS)
                 stop = self.last().stop
                 r.append((start, stop, f[0].format(
-                    code[typ[0].start:typ[-1].stop].encode() if typ else b"",
+                    code[ret[0].start:ret[-1].stop].encode() if ret else b"",
                     code[params[0].start:params[-1].stop].encode() if params else b"",
                     code[body[0].start:body[-1].stop].encode() if body else b""
                 )))
@@ -41,8 +43,10 @@ class PYCPParser(BaseParser):
                 )))
             elif self.peekim(Symbol("cinclude")):
                 start = self.last().start
-                body = self.readnwhile(SEMICOLON)
-                self.inc()
+                if self.peekm(CPARANS[0]):
+                    body = self.readrawparans(CPARANS)
+                else:
+                    body = self.readrawparans(PARANS)
                 stop = self.last().stop
                 r.append((start, stop, f[2].format(
                     code[body[0].start:body[-1].stop].encode() if body else b""
@@ -65,16 +69,20 @@ class PYCPParser(BaseParser):
                 )))
             elif self.peekim(Symbol("ctypedef")):
                 start = self.last().start
-                body = self.readnwhile(SEMICOLON)
-                self.inc()
+                if self.peekm(CPARANS[0]):
+                    body = self.readrawparans(CPARANS)
+                else:
+                    body = self.readrawparans(PARANS)
                 stop = self.last().stop
                 r.append((start, stop, f[5].format(
                     code[body[0].start:body[-1].stop].encode() if body else b""
                 )))
             elif self.peekim(Symbol("cdefine")):
                 start = self.last().start
-                body = self.readnwhile(SEMICOLON)
-                self.inc()
+                if self.peekm(CPARANS[0]):
+                    body = self.readrawparans(CPARANS)
+                else:
+                    body = self.readrawparans(PARANS)
                 stop = self.last().stop
                 r.append((start, stop, f[6].format(
                     code[body[0].start:body[-1].stop].encode() if body else b""
@@ -90,12 +98,29 @@ class PYCPParser(BaseParser):
                 )))
             elif self.peekim(Symbol("cfundef")):
                 start = self.last().start
-                typ = self.readnwhile(PARANS[0])
+                ret = self.readnwhile(PARANS[0])
                 params = self.readrawparans(PARANS)
                 stop = self.last().stop
                 r.append((start, stop, f[8].format(
-                    code[typ[0].start:typ[-1].stop].encode() if typ else b"",
+                    code[ret[0].start:ret[-1].stop].encode() if ret else b"",
                     code[params[0].start:params[-1].stop].encode() if params else b""
+                )))
+            elif self.peekim(Symbol("cdef")):
+                start = self.last().start
+                ret = self.readnwhile(PARANS[0])
+                name, ret = ret[-1], ret[:-1]
+                params = self.readrawparans(PARANS)
+                if self.peekim(TO):
+                    if len(ret) > 0:
+                        raise Exception("cannot have multiple return types in cdef")
+                    ret = self.readnwhile(CPARANS[0])
+                body = self.readrawparans(CPARANS)
+                stop = self.last().stop
+                r.append((start, stop, f[9].format(
+                    code[name.start:name.stop] if ret else b"",
+                    code[ret[0].start:ret[-1].stop].encode() if ret else b"",
+                    code[params[0].start:params[-1].stop].encode() if params else b"",
+                    code[body[0].start:body[-1].stop].encode() if body else b""
                 )))
             else:
                 self.inc()

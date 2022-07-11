@@ -1,8 +1,8 @@
-stdio = cinclude<stdio.h>;
+stdio = cinclude("stdio.h");
 
 import random;
 
-main = cdef cint() {
+cdef cint main() {
     stdio.printf("Totally random guess the number !\n");
     cint guess;
     cint number = random.randint(1, 10);

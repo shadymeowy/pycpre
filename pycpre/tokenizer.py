@@ -188,6 +188,7 @@ SEMICOLON = Special(";")
 DOT = Special(".")
 COMMA = Special(",")
 AT = Operator("@")
+TO = Operator("->")
 
 __tokenizer = Tokenizer()
 
