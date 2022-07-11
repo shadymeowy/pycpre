@@ -69,3 +69,5 @@ cullong = default_type("unsigned long long", cdefine "%llu";);
 cfloat = default_type("float", cdefine "%f";);
 cdouble = default_type("double", cdefine "%lf";);
 cvoid = default_type("void", cdefine "%p";);
+
+C = CDummySpace();

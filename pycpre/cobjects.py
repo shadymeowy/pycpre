@@ -272,5 +272,3 @@ def label():
 
 def build_template(defs=None, includes=None, sdec=None, ftypedef=None, simp=None, stypedef=None, fdec=None, glbs=None, fimp=None):
     return [defs, includes, sdec, ftypedef, simp, stypedef, fdec, glbs, fimp]
-
-C = CDummySpace()
