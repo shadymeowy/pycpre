@@ -76,10 +76,16 @@ class PYCPParser(BaseParser):
                 self._replace('CTypedef(locals(), globals(), {})'.format(body))
             elif self.peekim(Symbol("cdefine")):
                 self._start()
-                parans = CPARANS if self.peekm(CPARANS[0]) else PARANS
-                body = self._get(self.readrawparans(parans))
+                if self.peekm(SYMBOL):
+                    name = self._getn((self.read(),))
+                else:
+                    raise Exception('Expected a symbol for defined macro')
+                if self.peekm(CPARANS[0]):
+                    body = self._get(self.readrawparans(CPARANS))
+                else:
+                    body = self._get(self.readnwhile(SEMICOLON))
                 self._stop()
-                self._replace('CDefine(locals(), globals(), {})'.format(body))
+                self._replace('{} = CDefine(locals(), globals(), {}, {});'.format(name, repr(name), body))
             elif self.peekim(Symbol("cmacro")):
                 self._start()
                 name = self._getn(self.readnwhile(PARANS[0]))

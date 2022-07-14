@@ -129,15 +129,15 @@ class CTypedef(CLabelledObject):
 
 
 class CDefine(CLabelledObject):
-    def __init__(self, l, g, body):
+    def __init__(self, l, g, name, body):
         self.body = CFragment(l, g, body)
-        super().__init__()
+        super().__init__(name)
 
     def __cbuild__(self):
         if self.cache == None:
             bodyt = self.body.process()
             self.cache = build_template(
-                defs="#define {} {}".format(self.label, bodyt[0]))
+                defs="#define {} {}".format(self.label, bodyt[0].replace("\n", "\\\n")))
             self.deps.extend(bodyt[1])
 
         return self.cache

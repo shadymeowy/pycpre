@@ -55,22 +55,6 @@ class DefaultType(CRaw) {
     cmacro deref(a) {(*(a))}
 }
 
-cchar = DefaultType("char", cdefine("%c"));
-cuchar = DefaultType("unsigned char", cdefine("%d"));
-cshort = DefaultType("short", cdefine("%hi"));
-cushort = DefaultType("unsigned short", cdefine("%hu"));
-cint = DefaultType("int", cdefine("%d"));
-cuint = DefaultType("unsigned", cdefine("%du"));
-clong = DefaultType("long", cdefine("%ld"));
-culong = DefaultType("unsigned long", cdefine("%lu"));
-cllong = DefaultType("long long", cdefine("%lld"));
-cullong = DefaultType("unsigned long long", cdefine("%llu"));
-cfloat = DefaultType("float", cdefine("%f"));
-cdouble = DefaultType("double", cdefine("%lf"));
-cvoid = DefaultType("void", cdefine("%p"));
-
-C = CDummySpace();
-
 @generic
 def Pointer(T) {
     return ctypedef(T*);
@@ -79,11 +63,6 @@ def Pointer(T) {
 @generic
 def Array(T, N) {
     return carraydef T[N];
-}
-
-@generic
-def Include(path) {
-    return cinclude(path);
 }
 
 @generic
@@ -99,10 +78,27 @@ def Typedef(T) {
 
 @generic
 def Define(value) {
-    return cdefine(value);
+    cdefine r value;
+    return r;
 }
 
 @generic
 def FunctionPtr(R, T) {
     return cfundef R(tuple(T));
 }
+
+cchar = DefaultType("char", Define("%c"));
+cuchar = DefaultType("unsigned char", Define("%d"));
+cshort = DefaultType("short", Define("%hi"));
+cushort = DefaultType("unsigned short", Define("%hu"));
+cint = DefaultType("int", Define("%d"));
+cuint = DefaultType("unsigned", Define("%du"));
+clong = DefaultType("long", Define("%ld"));
+culong = DefaultType("unsigned long", Define("%lu"));
+cllong = DefaultType("long long", Define("%lld"));
+cullong = DefaultType("unsigned long long", Define("%llu"));
+cfloat = DefaultType("float", Define("%f"));
+cdouble = DefaultType("double", Define("%lf"));
+cvoid = DefaultType("void", Define("%p"));
+
+C = CDummySpace();

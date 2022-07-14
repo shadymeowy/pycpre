@@ -49,29 +49,12 @@ class DefaultType(CRaw):
     setp = CMacro(locals(), globals(), 'setp', 'a, b, c', '(a)->b=(c);')
     ref = CMacro(locals(), globals(), 'ref', 'a', '(&(a))')
     deref = CMacro(locals(), globals(), 'deref', 'a', '(*(a))')
-cchar = DefaultType("char", CDefine(locals(), globals(), '"%c"'))
-cuchar = DefaultType("unsigned char", CDefine(locals(), globals(), '"%d"'))
-cshort = DefaultType("short", CDefine(locals(), globals(), '"%hi"'))
-cushort = DefaultType("unsigned short", CDefine(locals(), globals(), '"%hu"'))
-cint = DefaultType("int", CDefine(locals(), globals(), '"%d"'))
-cuint = DefaultType("unsigned", CDefine(locals(), globals(), '"%du"'))
-clong = DefaultType("long", CDefine(locals(), globals(), '"%ld"'))
-culong = DefaultType("unsigned long", CDefine(locals(), globals(), '"%lu"'))
-cllong = DefaultType("long long", CDefine(locals(), globals(), '"%lld"'))
-cullong = DefaultType("unsigned long long", CDefine(locals(), globals(), '"%llu"'))
-cfloat = DefaultType("float", CDefine(locals(), globals(), '"%f"'))
-cdouble = DefaultType("double", CDefine(locals(), globals(), '"%lf"'))
-cvoid = DefaultType("void", CDefine(locals(), globals(), '"%p"'))
-C = CDummySpace()
 @generic
 def Pointer(T):
     return CTypedef(locals(), globals(), 'T*')
 @generic
 def Array(T, N):
     return CArrayTypedef(locals(), globals(), 'T', 'N')
-@generic
-def Include(path):
-    return CInclude(locals(), globals(), 'path')
 @generic
 def Global(T, value):
     r = CGlobal(locals(), globals(), 'r', 'T', 'value')
@@ -81,7 +64,22 @@ def Typedef(T):
     return CTypedef(locals(), globals(), 'T')
 @generic
 def Define(value):
-    return CDefine(locals(), globals(), 'value')
+    r = CDefine(locals(), globals(), 'r', 'value')
+    return r
 @generic
 def FunctionPtr(R, T):
     return CFunctionTypedef(locals(), globals(), 'R', 'tuple(T)')
+cchar = DefaultType("char", Define("%c"))
+cuchar = DefaultType("unsigned char", Define("%d"))
+cshort = DefaultType("short", Define("%hi"))
+cushort = DefaultType("unsigned short", Define("%hu"))
+cint = DefaultType("int", Define("%d"))
+cuint = DefaultType("unsigned", Define("%du"))
+clong = DefaultType("long", Define("%ld"))
+culong = DefaultType("unsigned long", Define("%lu"))
+cllong = DefaultType("long long", Define("%lld"))
+cullong = DefaultType("unsigned long long", Define("%llu"))
+cfloat = DefaultType("float", Define("%f"))
+cdouble = DefaultType("double", Define("%lf"))
+cvoid = DefaultType("void", Define("%p"))
+C = CDummySpace()
