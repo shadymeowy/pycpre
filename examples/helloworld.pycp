@@ -5,4 +5,4 @@ cdef cint main() {
     return 0;
 }
 
-build("helloworld.c", main=main);
+build(main, path="helloworld.c");

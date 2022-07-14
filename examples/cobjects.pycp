@@ -41,4 +41,4 @@ cdef cint main() {
     return 0;
 }
 
-build("cobjects.c", main=main);
+build(main, path="cobjects.c");

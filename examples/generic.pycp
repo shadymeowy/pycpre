@@ -56,4 +56,4 @@ cdef cint main() {
     return 0;
 }
 
-build("generic.c", main=main);
+build(main, path="generic.c");

@@ -3,11 +3,20 @@ from .pycp_parser import PYCPParser, CurlyParser
 from .special import cdeps, cbuild, cdeps
 
 
-def build(path=None, format=False, format_args=["-i"], formatter=None, **kargs):
+def build(*args, path=None, format=False, format_args=["-i"], formatter=None, **kargs):
     q = []
     for k, v in kargs.items():
         v.label = k
-        q.append(v)
+        if v not in q:
+            q.append(v)
+        else:
+            raise ValueError("Duplicate dependency: {}".format(k))
+    for v in args:
+        v.label = v.name
+        if v not in q:
+            q.append(v)
+        else:
+            raise ValueError("Duplicate dependency: {}".format(v.name))
     deps = []
     while q:
         dep = q.pop()

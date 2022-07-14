@@ -20,4 +20,4 @@ cdef cint main() {
     return 0;
 }
 
-build("number-guess.c", main=main);
+build(main, path="number-guess.c");
