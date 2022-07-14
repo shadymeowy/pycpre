@@ -8,11 +8,12 @@ MAGIC = "____PYCPRE_MAGIC____"
 
 class CParser(BaseParser):
     def _parse(self, l, g):
+        import builtins
         r = []
         code = self.tokens.code
         while self.peeknm(None):
             t = self.peek().value
-            o = getattr(g["__builtins__"], t) if hasattr(g["__builtins__"], t) else None
+            o = getattr(builtins, t) if hasattr(builtins, t) else None
             o = g[t] if t in g else o
             o = l[t] if t in l else o
             if is_followable(o):
