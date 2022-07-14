@@ -100,20 +100,31 @@ class PYCPParser(BaseParser):
                 self._replace('{} = CMacro(locals(), globals(), {}, {}, {});'.format(name, repr(name), params, body))
             elif self.peekim(Symbol("cfundef")):
                 self._start()
-                ret = self._get(self.readnwhile(PARANS[0]))
+                compound = self.readnwhile(PARANS[0])
+                name = self._getn(compound[-1:])
+                ret = compound[:-1]
                 params = self._get(self.readrawparans(PARANS))
+                if self.peekim(TO):
+                    if len(ret) > 0:
+                        raise Exception("cannot have multiple return types in cfundef")
+                    ret = self._get(self.readnwhile(SEMICOLON))
+                else:
+                    ret = self._get(ret)
                 self._stop()
-                self._replace('CFunctionTypedef(locals(), globals(), {}, {})'.format(ret, params))
+                self._replace('{} = CFunctionTypedef(locals(), globals(), {}, {}, {});'.format(
+                    name, repr(name), ret, params))
             elif self.peekim(Symbol("cdef")):
                 self._start()
                 compound = self.readnwhile(PARANS[0])
                 name = self._getn(compound[-1:])
-                ret = self._get(compound[:-1])
+                ret = compound[:-1]
                 params = self._get(self.readrawparans(PARANS))
                 if self.peekim(TO):
                     if len(ret) > 0:
                         raise Exception("cannot have multiple return types in cdef")
-                    ret = self.readnwhile(CPARANS[0])
+                    ret = self._get(self.readnwhile(CPARANS[0]))
+                else:
+                    ret = self._get(ret)
                 body = self._get(self.readrawparans(CPARANS))
                 self._stop()
                 self._replace('{} = CFunction(locals(), globals(), {}, {}, {}, {});'.format(

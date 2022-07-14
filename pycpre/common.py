@@ -71,7 +71,8 @@ def Define(value):
     return r
 @generic
 def FunctionPtr(R, T):
-    return CFunctionTypedef(locals(), globals(), 'R', 'tuple(T)')
+    r = CFunctionTypedef(locals(), globals(), 'r', 'R', 'tuple(T)')
+    return r
 cchar = DefaultType("char", Define("%c"))
 cuchar = DefaultType("unsigned char", Define("%d"))
 cshort = DefaultType("short", Define("%hi"))

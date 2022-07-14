@@ -87,7 +87,8 @@ def Define(value) {
 
 @generic
 def FunctionPtr(R, T) {
-    return cfundef R(tuple(T));
+    cfundef R r(tuple(T));
+    return r;
 }
 
 cchar = DefaultType("char", Define("%c"));

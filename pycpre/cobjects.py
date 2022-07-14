@@ -165,10 +165,10 @@ class CMacro(CLabelledObject):
 
 
 class CFunctionTypedef(CLabelledObject):
-    def __init__(self, l, g, ret, args):
+    def __init__(self, l, g, name, ret, args):
         self.ret = CFragment(l, g, ret)
         self.args = CFragment(l, g, args)
-        super().__init__()
+        super().__init__(name)
 
     def __cbuild__(self):
         if self.cache == None:
