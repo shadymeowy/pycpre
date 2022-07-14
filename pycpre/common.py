@@ -55,7 +55,8 @@ def Pointer(T):
     return r
 @generic
 def Array(T, N):
-    return CArrayTypedef(locals(), globals(), 'T', 'N')
+    r = CTypedef(locals(), globals(), 'r', 'T', '[N]')
+    return r
 @generic
 def Global(T, value):
     r = CGlobal(locals(), globals(), 'r', 'T', 'value')
