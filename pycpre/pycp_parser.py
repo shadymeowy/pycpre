@@ -1,145 +1,112 @@
-from .tokenizer import Symbol, PARANS, PARANS2, CPARANS, SEMICOLON, AT, TO
+from .tokenizer import Symbol, PARANS, PARANS2, CPARANS, SEMICOLON, AT, TO, EQ, AS
 from .baseparser import BaseParser
-
-template_strings = [
-    'cfunction(locals(), globals(), {}, {}, {})',
-    'cstruct(locals(), globals(), {})',
-    'cinclude(locals(), globals(), {})',
-    'cglobal(locals(), globals(), {}, {})',
-    'creplace(locals(), globals(), {})',
-    'ctypedef(locals(), globals(), {})',
-    'cdefine(locals(), globals(), {})',
-    'cmacro(locals(), globals(), {}, {})',
-    'cfundef(locals(), globals(), {}, {})',
-    'carraydef(locals(), globals(), {}, {})',
-    '{} = cdef(locals(), globals(), {}, {}, {})',
-]
-template_strings_semicolon = template_strings.copy()
-template_strings_semicolon[-1] += ';'
 
 
 class PYCPParser(BaseParser):
-    def _parse(self, semicolon=False):
-        f = template_strings_semicolon if semicolon else template_strings
-        r = []
+    def _start(self):
+        self.start = self.last().start
+
+    def _stop(self):
+        self.stop = self.last().stop
+
+    def _replace(self, value):
+        self.replacements.append((self.start, self.stop, value))
+
+    def _getn(self, tokens):
+        if tokens:
+            return self.tokens.code[tokens[0].start:tokens[-1].stop]
+        else:
+            return ''
+
+    def _get(self, tokens):
+        return repr(self._getn(tokens))
+
+    def _parse(self):
+        self.replacements = []
         code = self.tokens.code
         while self.peeknm(None):
             if self.peekim(Symbol("cfunction")):
-                start = self.last().start
-                ret = self.readnwhile(PARANS[0])
-                params = self.readrawparans(PARANS)
-                body = self.readrawparans(CPARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[0].format(
-                    code[ret[0].start:ret[-1].stop].encode() if ret else b"",
-                    code[params[0].start:params[-1].stop].encode() if params else b"",
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                self._start()
+                ret = self._get(self.readnwhile(PARANS[0]))
+                params = self._get(self.readrawparans(PARANS))
+                body = self._get(self.readrawparans(CPARANS))
+                self._stop()
+                self._replace('CFunction(locals(), globals(), "", {}, {}, {})'.format(ret, params, body))
             elif self.peekim(Symbol("cstruct")):
-                start = self.last().start
-                body = self.readrawparans(CPARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[1].format(
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                self._start()
+                name = self._getn(self.readnwhile(CPARANS[0]))
+                body = self._get(self.readrawparans(CPARANS))
+                self._stop()
+                self._replace('{} = CStruct(locals(), globals(), {}, {});'.format(name, repr(name), body))
             elif self.peekim(Symbol("cinclude")):
-                start = self.last().start
-                if self.peekm(CPARANS[0]):
-                    body = self.readrawparans(CPARANS)
-                else:
-                    body = self.readrawparans(PARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[2].format(
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                self._start()
+                parans = CPARANS if self.peekm(CPARANS[0]) else PARANS
+                body = self._get(self.readrawparans(parans))
+                self._stop()
+                self._replace('CInclude(locals(), globals(), {})'.format(body))
             elif self.peekim(Symbol("cglobal")):
-                start = self.last().start
-                typ = self.readnwhile(PARANS[0])
-                body = self.readrawparans(PARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[3].format(
-                    code[typ[0].start:typ[-1].stop].encode() if typ else b"",
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
-            elif self.peekim(Symbol("creplace")):
-                start = self.last().start
-                if self.peekm(CPARANS[0]):
-                    body = self.readrawparans(CPARANS)
+                self._start()
+                compound = self.readwhilef(lambda t: t != EQ and t != SEMICOLON)
+                name = self._getn(compound[-1:])
+                ret = self._get(compound[:-1])
+                if self.peekim(SEMICOLON):
+                    body = None
+                elif self.peekim(EQ):
+                    body = self._get(self.readnwhile(SEMICOLON))
                 else:
-                    body = self.readrawparans(PARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[4].format(
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                    raise Exception()
+                self._stop()
+                self._replace('{} = CGlobal(locals(), globals(), {}, {}, {});'.format(name, repr(name), typ, body))
             elif self.peekim(Symbol("ctypedef")):
-                start = self.last().start
-                if self.peekm(CPARANS[0]):
-                    body = self.readrawparans(CPARANS)
-                else:
-                    body = self.readrawparans(PARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[5].format(
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                self._start()
+                parans = CPARANS if self.peekm(CPARANS[0]) else PARANS
+                body = self._get(self.readrawparans(parans))
+                self._stop()
+                self._replace('CTypedef(locals(), globals(), {})'.format(body))
             elif self.peekim(Symbol("cdefine")):
-                start = self.last().start
-                if self.peekm(CPARANS[0]):
-                    body = self.readrawparans(CPARANS)
-                else:
-                    body = self.readrawparans(PARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[6].format(
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                self._start()
+                parans = CPARANS if self.peekm(CPARANS[0]) else PARANS
+                body = self._get(self.readrawparans(parans))
+                self._stop()
+                self._replace('CDefine(locals(), globals(), {})'.format(body))
             elif self.peekim(Symbol("cmacro")):
-                start = self.last().start
-                params = self.readrawparans(PARANS)
-                body = self.readrawparans(CPARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[7].format(
-                    code[params[0].start:params[-1].stop].encode() if params else b"",
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                self._start()
+                name = self._getn(self.readnwhile(PARANS[0]))
+                params = self._get(self.readrawparans(PARANS))
+                body = self._get(self.readrawparans(CPARANS))
+                self._stop()
+                self._replace('{} = CMacro(locals(), globals(), {}, {}, {});'.format(name, repr(name), params, body))
             elif self.peekim(Symbol("cfundef")):
-                start = self.last().start
-                ret = self.readnwhile(PARANS[0])
-                params = self.readrawparans(PARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[8].format(
-                    code[ret[0].start:ret[-1].stop].encode() if ret else b"",
-                    code[params[0].start:params[-1].stop].encode() if params else b""
-                )))
+                self._start()
+                ret = self._get(self.readnwhile(PARANS[0]))
+                params = self._get(self.readrawparans(PARANS))
+                self._stop()
+                self._replace('CFunctionTypedef(locals(), globals(), {}, {})'.format(ret, params))
             elif self.peekim(Symbol("carraydef")):
-                start = self.last().start
-                typ = self.readnwhile(PARANS2[0])
-                size = self.readrawparans(PARANS2)
-                stop = self.last().stop
-                r.append((start, stop, f[9].format(
-                    code[typ[0].start:typ[-1].stop].encode() if typ else b"",
-                    code[size[0].start:size[-1].stop].encode() if size else b""
-                )))
+                self._start()
+                typ = self._get(self.readnwhile(PARANS2[0]))
+                size = self._get(self.readrawparans(PARANS2))
+                self._stop()
+                self._replace('CArrayTypedef(locals(), globals(), {}, {})'.format(typ, size))
             elif self.peekim(Symbol("cdef")):
-                start = self.last().start
-                ret = self.readnwhile(PARANS[0])
-                name, ret = ret[-1], ret[:-1]
-                params = self.readrawparans(PARANS)
+                self._start()
+                compound = self.readnwhile(PARANS[0])
+                name = self._getn(compound[-1:])
+                ret = self._get(compound[:-1])
+                params = self._get(self.readrawparans(PARANS))
                 if self.peekim(TO):
                     if len(ret) > 0:
                         raise Exception("cannot have multiple return types in cdef")
                     ret = self.readnwhile(CPARANS[0])
-                body = self.readrawparans(CPARANS)
-                stop = self.last().stop
-                r.append((start, stop, f[10].format(
-                    code[name.start:name.stop] if ret else b"",
-                    code[ret[0].start:ret[-1].stop].encode() if ret else b"",
-                    code[params[0].start:params[-1].stop].encode() if params else b"",
-                    code[body[0].start:body[-1].stop].encode() if body else b""
-                )))
+                body = self._get(self.readrawparans(CPARANS))
+                self._stop()
+                self._replace('{} = CFunction(locals(), globals(), {}, {}, {}, {});'.format(
+                    name, repr(name), ret, params, body))
             else:
                 self.inc()
         b = []
         start = 0
-        for s in r:
+        for s in self.replacements:
             b.append(code[start:s[0]])
             b.append(s[2])
             start = s[1]

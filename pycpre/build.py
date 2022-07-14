@@ -80,7 +80,7 @@ def process_file(file, output, cdef=True, curl=True, auto_import=True):
     code = open(file, "r").read()
     if cdef:
         tokens = tokenize(code)
-        code = PYCPParser.parse(tokens, curl)
+        code = PYCPParser.parse(tokens)
     if curl:
         tokens = tokenize(code)
         code = CurlyParser.parse(tokens)

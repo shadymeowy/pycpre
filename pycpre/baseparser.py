@@ -78,6 +78,12 @@ class BaseParser():
             r.append(self.read())
         return r
 
+    def readwhilef(self, f):
+        r = []
+        while f(self.peek()):
+            r.append(self.read())
+        return r
+
     def readrawparans(self, parans, include=False):
         r = []
         self.readrm(parans[0])

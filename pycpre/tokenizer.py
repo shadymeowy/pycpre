@@ -189,6 +189,7 @@ DOT = Special(".")
 COMMA = Special(",")
 AT = Operator("@")
 TO = Operator("->")
+EQ = Operator("=")
 
 __tokenizer = Tokenizer()
 
