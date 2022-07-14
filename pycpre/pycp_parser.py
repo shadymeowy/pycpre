@@ -1,4 +1,4 @@
-from .tokenizer import Symbol, PARANS, PARANS2, CPARANS, SEMICOLON, AT, TO, EQ, AS
+from .tokenizer import Symbol, PARANS, PARANS2, PARANS3, CPARANS, SEMICOLON, AT, TO, EQ, AS, STRING, SYMBOL
 from .baseparser import BaseParser
 
 
@@ -40,10 +40,21 @@ class PYCPParser(BaseParser):
                 self._replace('{} = CStruct(locals(), globals(), {}, {});'.format(name, repr(name), body))
             elif self.peekim(Symbol("cinclude")):
                 self._start()
-                parans = CPARANS if self.peekm(CPARANS[0]) else PARANS
-                body = self._get(self.readrawparans(parans))
+                if self.peekm(PARANS3[0]):
+                    header = repr("<{}>".format(self._getn(self.readrawparans(PARANS3))))
+                elif self.peekm(STRING):
+                    header = self._get((self.read(),))
+                else:
+                    raise Exception('Expected header name or string')
+                if self.peekim(AS):
+                    if self.peekm(SYMBOL):
+                        name = self._getn((self.read(),))
+                    else:
+                        raise Exception('Expected a symbol for included header')
+                else:
+                    name = "_"
                 self._stop()
-                self._replace('CInclude(locals(), globals(), {})'.format(body))
+                self._replace('{} = CInclude(locals(), globals(), {});'.format(name, header))
             elif self.peekim(Symbol("cglobal")):
                 self._start()
                 compound = self.readwhilef(lambda t: t != EQ and t != SEMICOLON)

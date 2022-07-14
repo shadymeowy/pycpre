@@ -190,6 +190,7 @@ COMMA = Special(",")
 AT = Operator("@")
 TO = Operator("->")
 EQ = Operator("=")
+AS = Symbol("as")
 
 __tokenizer = Tokenizer()
 

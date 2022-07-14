@@ -1,4 +1,4 @@
-stdio = cinclude("stdio.h");
+cinclude "stdio.h" as stdio
 
 def apply_cfun(f) {
     return cfunction void(cint x[], cint n) {

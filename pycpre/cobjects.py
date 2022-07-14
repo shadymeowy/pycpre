@@ -80,15 +80,12 @@ class CStruct(CLabelledObject):
 
 class CInclude(CObject):
     def __init__(self, l, g, header):
-        self.header = CFragment(l, g, header)
+        self.header = header
         super().__init__()
 
     def __cbuild__(self):
         if self.cache == None:
-            headert = self.header.process()
-            self.cache = build_template(includes="#include {}".format(headert[0]))
-            self.deps.extend(headert[1])
-            self.deps.extend(headert[1])
+            self.cache = build_template(includes="#include {}".format(self.header))
         return self.cache
 
     def __getattr__(self, value):

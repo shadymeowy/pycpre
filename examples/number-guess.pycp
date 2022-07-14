@@ -1,4 +1,4 @@
-stdio = cinclude("stdio.h");
+cinclude "stdio.h" as stdio
 
 import random;
 

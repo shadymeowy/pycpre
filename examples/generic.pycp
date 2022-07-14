@@ -1,5 +1,5 @@
-stdio = cinclude("stdio.h");
-stdlib = cinclude("stdlib.h");
+cinclude "stdio.h" as stdio
+cinclude "stdlib.h" as stdlib
 
 @generic
 def Point(T) {
