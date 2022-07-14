@@ -51,7 +51,8 @@ class DefaultType(CRaw):
     deref = CMacro(locals(), globals(), 'deref', 'a', '(*(a))')
 @generic
 def Pointer(T):
-    return CTypedef(locals(), globals(), 'T*')
+    r = CTypedef(locals(), globals(), 'r', 'T *', '')
+    return r
 @generic
 def Array(T, N):
     return CArrayTypedef(locals(), globals(), 'T', 'N')
@@ -61,7 +62,8 @@ def Global(T, value):
     return r
 @generic
 def Typedef(T):
-    return CTypedef(locals(), globals(), 'T')
+    r = CTypedef(locals(), globals(), 'r', 'T', '')
+    return r
 @generic
 def Define(value):
     r = CDefine(locals(), globals(), 'r', 'value')

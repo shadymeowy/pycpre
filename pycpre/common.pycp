@@ -57,12 +57,14 @@ class DefaultType(CRaw) {
 
 @generic
 def Pointer(T) {
-    return ctypedef(T*);
+    ctypedef T *r;
+    return r;
 }
 
 @generic
 def Array(T, N) {
-    return carraydef T[N];
+    ctypedef T r[N];
+    return r;
 }
 
 @generic
@@ -73,7 +75,8 @@ def Global(T, value) {
 
 @generic
 def Typedef(T) {
-    return ctypedef(T);
+    ctypedef T r;
+    return r;
 }
 
 @generic

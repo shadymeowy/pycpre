@@ -114,16 +114,19 @@ class CGlobal(CLabelledObject):
 
 
 class CTypedef(CLabelledObject):
-    def __init__(self, l, g, body):
-        self.body = CFragment(l, g, body)
-        super().__init__()
+    def __init__(self, l, g, name, typ, size):
+        self.typ = CFragment(l, g, typ)
+        self.size = CFragment(l, g, size)
+        super().__init__(name)
 
     def __cbuild__(self):
         if self.cache == None:
-            bodyt = self.body.process()
+            typt = self.typ.process()
+            sizet = self.size.process()
             self.cache = build_template(
-                ftypedef="typedef {} {};".format(bodyt[0], self.label))
-            self.deps.extend(bodyt[1])
+                ftypedef="typedef {} {}{};".format(typt[0], self.label, sizet[0]))
+            self.deps.extend(typt[1])
+            self.deps.extend(sizet[1])
 
         return self.cache
 
@@ -175,24 +178,6 @@ class CFunctionTypedef(CLabelledObject):
                 ftypedef="typedef {} (*{})({});".format(rett[0], self.label, argst[0]))
             self.deps.extend(rett[1])
             self.deps.extend(argst[1])
-
-        return self.cache
-
-
-class CArrayTypedef(CLabelledObject):
-    def __init__(self, l, g, typ, size):
-        self.typ = CFragment(l, g, typ)
-        self.size = CFragment(l, g, size)
-        super().__init__()
-
-    def __cbuild__(self):
-        if self.cache == None:
-            typt = self.typ.process()
-            sizet = self.size.process()
-            self.cache = build_template(
-                ftypedef="typedef {} {}[{}];".format(typt[0], self.label, sizet[0]))
-            self.deps.extend(typt[1])
-            self.deps.extend(sizet[1])
 
         return self.cache
 

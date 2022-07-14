@@ -70,10 +70,15 @@ class PYCPParser(BaseParser):
                 self._replace('{} = CGlobal(locals(), globals(), {}, {}, {});'.format(name, repr(name), typ, body))
             elif self.peekim(Symbol("ctypedef")):
                 self._start()
-                parans = CPARANS if self.peekm(CPARANS[0]) else PARANS
-                body = self._get(self.readrawparans(parans))
+                compound = self.readwhilef(lambda t: t != PARANS2[0] and t != SEMICOLON)
+                name = self._getn(compound[-1:])
+                typ = self._get(compound[:-1])
+                if self.peekim(SEMICOLON):
+                    size = "''"
+                else:
+                    size = self._get(self.readnwhile(SEMICOLON))
                 self._stop()
-                self._replace('CTypedef(locals(), globals(), {})'.format(body))
+                self._replace('{} = CTypedef(locals(), globals(), {}, {}, {});'.format(name, repr(name), typ, size))
             elif self.peekim(Symbol("cdefine")):
                 self._start()
                 if self.peekm(SYMBOL):
@@ -99,12 +104,6 @@ class PYCPParser(BaseParser):
                 params = self._get(self.readrawparans(PARANS))
                 self._stop()
                 self._replace('CFunctionTypedef(locals(), globals(), {}, {})'.format(ret, params))
-            elif self.peekim(Symbol("carraydef")):
-                self._start()
-                typ = self._get(self.readnwhile(PARANS2[0]))
-                size = self._get(self.readrawparans(PARANS2))
-                self._stop()
-                self._replace('CArrayTypedef(locals(), globals(), {}, {})'.format(typ, size))
             elif self.peekim(Symbol("cdef")):
                 self._start()
                 compound = self.readnwhile(PARANS[0])
