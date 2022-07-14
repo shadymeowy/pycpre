@@ -18,6 +18,13 @@ class PYCPParser(BaseParser):
         else:
             return ''
 
+    def _getg(self):
+        if self.peekm(PARANS2[0]):
+            params = self._getn(self.readrawparans(PARANS2))
+            return 'generic(lambda {}: '.format(params)
+        else:
+            return '('
+
     def _get(self, tokens):
         return repr(self._getn(tokens))
 
@@ -27,17 +34,20 @@ class PYCPParser(BaseParser):
         while self.peeknm(None):
             if self.peekim(Symbol("cfunction")):
                 self._start()
-                ret = self._get(self.readnwhile(PARANS[0]))
+                ret = self._get(self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0]))
+                generic = self._getg()
                 params = self._get(self.readrawparans(PARANS))
                 body = self._get(self.readrawparans(CPARANS))
                 self._stop()
-                self._replace('CFunction(locals(), globals(), "", {}, {}, {})'.format(ret, params, body))
+                self._replace('{}CFunction(locals(), globals(), "", {}, {}, {}))'.format(generic, ret, params, body))
+
             elif self.peekim(Symbol("cstruct")):
                 self._start()
-                name = self._getn(self.readnwhile(CPARANS[0]))
+                name = self._getn(self.readwhilef(lambda t: t != CPARANS[0] and t != PARANS2[0]))
+                generic = self._getg()
                 body = self._get(self.readrawparans(CPARANS))
                 self._stop()
-                self._replace('{} = CStruct(locals(), globals(), {}, {});'.format(name, repr(name), body))
+                self._replace('{} = {}CStruct(locals(), globals(), {}, {}));'.format(name, generic, repr(name), body))
             elif self.peekim(Symbol("cinclude")):
                 self._start()
                 if self.peekm(PARANS3[0]):
@@ -115,9 +125,10 @@ class PYCPParser(BaseParser):
                     name, repr(name), ret, params))
             elif self.peekim(Symbol("cdef")):
                 self._start()
-                compound = self.readnwhile(PARANS[0])
+                compound = self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0])
                 name = self._getn(compound[-1:])
                 ret = compound[:-1]
+                generic = self._getg()
                 params = self._get(self.readrawparans(PARANS))
                 if self.peekim(TO):
                     if len(ret) > 0:
@@ -127,8 +138,8 @@ class PYCPParser(BaseParser):
                     ret = self._get(ret)
                 body = self._get(self.readrawparans(CPARANS))
                 self._stop()
-                self._replace('{} = CFunction(locals(), globals(), {}, {}, {}, {});'.format(
-                    name, repr(name), ret, params, body))
+                self._replace('{} = {}CFunction(locals(), globals(), {}, {}, {}, {}));'.format(
+                    name, generic, repr(name), ret, params, body))
             else:
                 self.inc()
         b = []

@@ -2,7 +2,7 @@ cinclude "stdio.h" as stdio
 cinclude "stdlib.h" as stdlib
 
 @generic
-def Point(T) {
+def Point(T=cdouble) {
     cstruct S {
         T x;
         T y;
@@ -21,38 +21,30 @@ def Point(T) {
     return S;
 }
 
-@generic
-def new(T) {
-    return cfunction T*() {
-        return stdlib.calloc(1, sizeof(T));
-    };
+cdef new[T]() -> T* {
+    return stdlib.calloc(1, sizeof(T));
 }
 
-@generic
-def destroy(T) {
-    return cfunction void(T* o) {
-        stdlib.free(o);
-    };
+cdef destroy[T](T* p) -> void {
+    stdlib.free(p);
 }
 
-@generic
-def add(T, b) {
-    return cfunction T(T a) {
-        return T.add(a, b);
-    };
+cdef add[T=cint, N=1](T a) -> T {
+    return T.add(a, N);
 }
 
 cdef cint main() {
-    Point[cint]* a = new[Point[cint]]();
-    Point[cint] b = {1, 2};
-    Point[cint] c = Point[cint].add(*a, b);
+    Point* a = new[Point]();
+    Point b = {1, 2};
+    Point c = Point.add(*a, b);
 
-    stdio.printf("Len: " cint.format "\n", Point[cint].len(c));
+    stdio.printf("Len: " cdouble.format "\n", Point.len(c));
 
-    stdio.printf("2 + 3 = " cint.format "\n", add[cint, 2](3));
-    stdio.printf("2. + 3. = " cdouble.format "\n", add[cdouble, 2](3));
+    stdio.printf(cint.format "\n", add(3));
+    stdio.printf(cdouble.format "\n", add[cdouble](3));
+    stdio.printf(cdouble.format "\n", add[cdouble, 2](3));
 
-    destroy[Point[cint]](a);
+    destroy[Point](a);
     return 0;
 }
 

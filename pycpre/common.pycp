@@ -68,26 +68,27 @@ def Array(T, N) {
 }
 
 @generic
+def FunctionPtr(R, T) {
+    cfundef R r(tuple(T));
+    return r;
+}
+
+
+@generic_callable
 def Global(T, value) {
     cglobal T r = value;
     return r;
 }
 
-@generic
+@generic_callable
 def Typedef(T) {
     ctypedef T r;
     return r;
 }
 
-@generic
+@generic_callable
 def Define(value) {
     cdefine r value;
-    return r;
-}
-
-@generic
-def FunctionPtr(R, T) {
-    cfundef R r(tuple(T));
     return r;
 }
 

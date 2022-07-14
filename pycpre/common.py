@@ -58,20 +58,20 @@ def Array(T, N):
     r = CTypedef(locals(), globals(), 'r', 'T', '[N]')
     return r
 @generic
+def FunctionPtr(R, T):
+    r = CFunctionTypedef(locals(), globals(), 'r', 'R', 'tuple(T)')
+    return r
+@generic_callable
 def Global(T, value):
     r = CGlobal(locals(), globals(), 'r', 'T', 'value')
     return r
-@generic
+@generic_callable
 def Typedef(T):
     r = CTypedef(locals(), globals(), 'r', 'T', '')
     return r
-@generic
+@generic_callable
 def Define(value):
     r = CDefine(locals(), globals(), 'r', 'value')
-    return r
-@generic
-def FunctionPtr(R, T):
-    r = CFunctionTypedef(locals(), globals(), 'r', 'R', 'tuple(T)')
     return r
 cchar = DefaultType("char", Define("%c"))
 cuchar = DefaultType("unsigned char", Define("%d"))
