@@ -1,8 +1,12 @@
 stdio = cinclude("stdio.h");
 stdlib = cinclude("stdlib.h");
 
-@generic_space
-def Point(S, T) {
+@generic
+def Point(T) {
+    cstruct S {
+        T x;
+        T y;
+    }
     S.len = cfunction T(S p) {
         T x = p.x;
         T y = p.y;
@@ -14,10 +18,7 @@ def Point(S, T) {
     S.sub = cfunction S(S a, S b) {
         return (S){T.sub(a.x, b.x), T.sub(a.y, b.y)};
     };
-    return cstruct {
-        T x;
-        T y;
-    };
+    return S;
 }
 
 @generic
