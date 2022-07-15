@@ -22,6 +22,9 @@ class CObject():
 class CLabelledObject(CObject):
     def __init__(self, name=""):
         super().__init__()
+        name = name.replace(".", "_")
+        if not name.isalnum() or not name[0].isalpha():
+            name = ""
         self.name = name
         self.label = label(name)
 
