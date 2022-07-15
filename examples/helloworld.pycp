@@ -1,4 +1,4 @@
-cinclude "stdio.h" as stdio
+include "stdio.h" as stdio
 
 cdef main() -> cint {
     stdio.printf("Hello World !\n");

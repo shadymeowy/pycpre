@@ -1,9 +1,9 @@
-cinclude "stdio.h" as stdio
-cinclude "stdlib.h" as stdlib
+include "stdio.h" as stdio
+include "stdlib.h" as stdlib
 
 @generic
 def Point(T=cdouble):
-    cstruct S {
+    struct S {
         T x;
         T y;
     }

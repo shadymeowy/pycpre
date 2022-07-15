@@ -59,17 +59,17 @@ def Pointer(T):
 
 @generic
 def Array(T, N):
-    r = CTypedef(locals(), globals(), 'r', 'T', '[N]');;
+    r = CTypedef(locals(), globals(), 'r', 'T', '[N]');
     return r
 
 @generic
 def FunctionPtr(R, T):
-    r = (CFunctionTypedef(locals(), globals(), 'r', 'R', 'tuple(T)'));;
+    r = (CFunctionTypedef(locals(), globals(), 'r', 'R', 'tuple(T)'));
     return r
 
 @generic_callable
 def Global(T, value):
-    r = CGlobal(locals(), globals(), 'r', 'T', 'value');;
+    r = CGlobal(locals(), globals(), 'r', 'T', 'value');
     return r
 
 @generic_callable
@@ -79,7 +79,7 @@ def Typedef(T):
 
 @generic_callable
 def Define(value):
-    r = CDefine(locals(), globals(), 'r', 'value');;
+    r = CDefine(locals(), globals(), 'r', 'value');
     return r
 
 cchar = DefaultType("char", Define("%c"))

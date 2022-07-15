@@ -7,64 +7,64 @@ class DefaultType(CRaw):
         if format:
             self.format = format
 
-    cmacro add(a, b) {((a)+(b))}
-    cmacro sub(a, b) {((a)-(b))}
-    cmacro mul(a, b) {((a)*(b))}
-    cmacro div(a, b) {((a)/(b))}
-    cmacro eq(a, b) {((a)==(b))}
-    cmacro ne(a, b) {((a)!=(b))}
-    cmacro lt(a, b) {((a)<(b))}
-    cmacro gt(a, b) {((a)>(b))}
-    cmacro le(a, b) {((a)<=(b))}
-    cmacro ge(a, b) {((a)>=(b))}
-    cmacro mod(a, b) {((a) % (b))}
-    cmacro lnot(a) {(!(a))}
-    cmacro neg(a) {(-(a))}
-    cmacro pos(a) {(+(a))}
-    cmacro lshift(a, b) {((a)<<(b))}
-    cmacro rshift(a, b) {((a)>>(b))}
-    cmacro land(a, b) {((a)&&(b))}
-    cmacro lor(a, b) {((a)||(b))}
-    cmacro band(a, b) {((a)&(b))}
-    cmacro bor(a, b) {((a)|(b))}
-    cmacro xor(a, b) {((a)^(b))}
-    cmacro bnot(a) {(~(a))}
-    cmacro iadd1(a) {((a)++)}
-    cmacro isub1(a) {((a)--)}
-    cmacro assign(a, b) {(a)=(b);}
-    cmacro iadd(a, b) {(a)+=(b);}
-    cmacro isub(a, b) {(a)-=(b);}
-    cmacro imul(a, b) {(a)*=(b);}
-    cmacro idiv(a, b) {(a)/=(b);}
-    cmacro imod(a, b) {(a)%=(b);}
-    cmacro isub(a, b) {(a)<<=(b);}
-    cmacro ilshift(a, b) {(a)>>=(b);}
-    cmacro irshift(a, b) {(a)/=(b);}
-    cmacro iband(a, b) {(a)&=(b);}
-    cmacro ibor(a, b) {(a)|=(b);}
-    cmacro ixor(a, b) {(a)^=(b);}
-    cmacro getindex(a, b) {((a)[(b)])}
-    cmacro setindex(a, b, c) {(a)[(b)]=(c);}
-    cmacro get(a, b) {((a).b)}
-    cmacro set(a, b, c) {(a).b=(c);}
-    cmacro getp(a, b) {((a)->b)}
-    cmacro setp(a, b, c) {(a)->b=(c);}
-    cmacro ref(a) {(&(a))}
-    cmacro deref(a) {(*(a))}
+    macro add(a, b) {((a)+(b))}
+    macro sub(a, b) {((a)-(b))}
+    macro mul(a, b) {((a)*(b))}
+    macro div(a, b) {((a)/(b))}
+    macro eq(a, b) {((a)==(b))}
+    macro ne(a, b) {((a)!=(b))}
+    macro lt(a, b) {((a)<(b))}
+    macro gt(a, b) {((a)>(b))}
+    macro le(a, b) {((a)<=(b))}
+    macro ge(a, b) {((a)>=(b))}
+    macro mod(a, b) {((a) % (b))}
+    macro lnot(a) {(!(a))}
+    macro neg(a) {(-(a))}
+    macro pos(a) {(+(a))}
+    macro lshift(a, b) {((a)<<(b))}
+    macro rshift(a, b) {((a)>>(b))}
+    macro land(a, b) {((a)&&(b))}
+    macro lor(a, b) {((a)||(b))}
+    macro band(a, b) {((a)&(b))}
+    macro bor(a, b) {((a)|(b))}
+    macro xor(a, b) {((a)^(b))}
+    macro bnot(a) {(~(a))}
+    macro iadd1(a) {((a)++)}
+    macro isub1(a) {((a)--)}
+    macro assign(a, b) {(a)=(b);}
+    macro iadd(a, b) {(a)+=(b);}
+    macro isub(a, b) {(a)-=(b);}
+    macro imul(a, b) {(a)*=(b);}
+    macro idiv(a, b) {(a)/=(b);}
+    macro imod(a, b) {(a)%=(b);}
+    macro isub(a, b) {(a)<<=(b);}
+    macro ilshift(a, b) {(a)>>=(b);}
+    macro irshift(a, b) {(a)/=(b);}
+    macro iband(a, b) {(a)&=(b);}
+    macro ibor(a, b) {(a)|=(b);}
+    macro ixor(a, b) {(a)^=(b);}
+    macro getindex(a, b) {((a)[(b)])}
+    macro setindex(a, b, c) {(a)[(b)]=(c);}
+    macro get(a, b) {((a).b)}
+    macro set(a, b, c) {(a).b=(c);}
+    macro getp(a, b) {((a)->b)}
+    macro setp(a, b, c) {(a)->b=(c);}
+    macro ref(a) {(&(a))}
+    macro deref(a) {(*(a))}
 
 @generic
 def Pointer(T):
-    ctypedef T *r;
+    typedef T *r;
     return r
 
 @generic
 def Array(T, N):
-    ctypedef T r[N];
+    typedef T r[N];
     return r
 
 @generic
 def FunctionPtr(R, T):
-    ctypedef r(tuple(T)) -> R;
+    typedef r(tuple(T)) -> R;
     return r
 
 @generic_callable
@@ -74,12 +74,12 @@ def Global(T, value):
 
 @generic_callable
 def Typedef(T):
-    ctypedef T r;
+    typedef T r;
     return r
 
 @generic_callable
 def Define(value):
-    cdefine r value;
+    define r value;
     return r
 
 cchar = DefaultType("char", Define("%c"))
