@@ -32,16 +32,7 @@ class PYCPParser(BaseParser):
         self.replacements = []
         code = self.tokens.code
         while self.peeknm(None):
-            if self.peekim(Symbol("cfunction")):
-                self._start()
-                ret = self._get(self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0]))
-                generic = self._getg()
-                params = self._get(self.readrawparans(PARANS))
-                body = self._get(self.readrawparans(CPARANS))
-                self._stop()
-                self._replace('{}CFunction(locals(), globals(), "", {}, {}, {}))'.format(generic, ret, params, body))
-
-            elif self.peekim(Symbol("cstruct")):
+            if self.peekim(Symbol("cstruct")):
                 self._start()
                 name = self._getn(self.readwhilef(lambda t: t != CPARANS[0] and t != PARANS2[0]))
                 generic = self._getg()
@@ -125,17 +116,13 @@ class PYCPParser(BaseParser):
                     name, repr(name), ret, params))
             elif self.peekim(Symbol("cdef")):
                 self._start()
-                compound = self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0])
-                name = self._getn(compound[-1:])
-                ret = compound[:-1]
+                name = self._getn(self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0]))
                 generic = self._getg()
                 params = self._get(self.readrawparans(PARANS))
                 if self.peekim(TO):
-                    if len(ret) > 0:
-                        raise Exception("cannot have multiple return types in cdef")
                     ret = self._get(self.readnwhile(CPARANS[0]))
                 else:
-                    ret = self._get(ret)
+                    ret = repr("void")
                 body = self._get(self.readrawparans(CPARANS))
                 self._stop()
                 self._replace('{} = {}CFunction(locals(), globals(), {}, {}, {}, {}));'.format(
