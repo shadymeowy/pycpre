@@ -12,6 +12,7 @@ def main():
     parser.add_argument('-r', '--remove', action='store_true', help='remove the .py files after running')
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1.0')
     parser.add_argument('-i', '--no-import', action='store_true', help='disable auto-importing pycpre')
+    parser.add_argument('-c', '--curly', action='store_true', help='enable curly brackets parsing for Python')
     parser.add_argument('files', nargs='+', help='files to process')
     args = parser.parse_args()
     for file in args.files:
@@ -21,7 +22,7 @@ def main():
             if len(args.files) > 1:
                 raise Exception("Cannot specify output file when processing multiple files")
             output = args.output
-        process_file(file, output, auto_import=not args.no_import)
+        process_file(file, output, auto_import=not args.no_import, curl=args.curly)
 
     if not args.no_run:
         import subprocess, sys

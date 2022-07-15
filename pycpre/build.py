@@ -1,5 +1,5 @@
 from .tokenizer import tokenize
-from .pycp_parser import PYCPParser, CurlyParser
+from .pycp_parser import PYCPParser
 from .special import cdeps, cbuild, cdeps
 
 
@@ -57,43 +57,16 @@ def build(*args, path=None, format=False, format_args=["-i"], formatter=None, **
     return result
 
 
-def _convert_curly(r):
-    b = []
-    _curly_traverse(r, b, 0)
-    t = []
-    for i in range(len(b) - 1):
-        t1 = b[i]
-        t.append("    " * t1[0])
-        t.append(t1[1])
-        if b[i + 1][0] == t1[0] + 1:
-            t.append(":\n")
-        else:
-            t.append("\n")
-    t1 = b[-1]
-    t.append(t1[0] * "    ")
-    t.append(t1[1])
-    t.append("\n")
-    return "".join(t).replace("@{", "{")
-
-
-def _curly_traverse(r, b, i):
-    for a in r:
-        if isinstance(a, str):
-            b.append((i, a))
-        else:
-            b.append((i, a[0]))
-            _curly_traverse(a[1], b, i + 1)
-
-
-def process_file(file, output, cdef=True, curl=True, auto_import=True):
+def process_file(file, output, cdef=True, curl=False, auto_import=True):
     code = open(file, "r").read()
     if cdef:
         tokens = tokenize(code)
         code = PYCPParser.parse(tokens)
     if curl:
+        from .curly_parser import CurlyParser, convert_curly
         tokens = tokenize(code)
         code = CurlyParser.parse(tokens)
-        code = _convert_curly(code)
+        code = convert_curly(code)
     with open(output, "w") as f:
         if auto_import:
             f.write("from pycpre import *\n")

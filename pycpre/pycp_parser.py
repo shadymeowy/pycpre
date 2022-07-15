@@ -1,4 +1,3 @@
-from lib2to3.pgen2.token import SEMI
 from .tokenizer import Symbol, PARANS, PARANS2, PARANS3, CPARANS, SEMICOLON, AT, TO, EQ, AS, STRING, SYMBOL
 from .baseparser import BaseParser
 
@@ -139,36 +138,3 @@ class PYCPParser(BaseParser):
             start = s[1]
         b.append(code[start:-1])
         return "".join(b)
-
-
-class CurlyParser(BaseParser):
-    def _parse(self):
-        r = []
-        self.tokens.append(SEMICOLON)
-        self.ll += 1
-        while self.peeknm(None):
-            r.append(self.expr())
-        return r
-
-    def expr(self):
-        r = []
-        start = self.peek().start
-        stop = None
-        while True:
-            if self.peekm(CPARANS[0]):
-                self.inc()
-                while self.peekinm(CPARANS[1]):
-                    r.append(self.expr())
-                self.peekim(SEMICOLON)
-                return self.tokens.code[start:stop], r
-            elif self.peekm(SEMICOLON):
-                self.inc()
-                self.readwhile(SEMICOLON)
-                return self.tokens.code[start:stop]
-            elif self.peekim(AT):
-                if self.peekm(CPARANS[0]):
-                    self.inc()
-                else:
-                    stop = self.read().stop
-            else:
-                stop = self.read().stop
