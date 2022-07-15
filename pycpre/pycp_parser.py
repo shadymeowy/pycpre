@@ -1,3 +1,4 @@
+from lib2to3.pgen2.token import SEMI
 from .tokenizer import Symbol, PARANS, PARANS2, PARANS3, CPARANS, SEMICOLON, AT, TO, EQ, AS, STRING, SYMBOL
 from .baseparser import BaseParser
 
@@ -71,15 +72,31 @@ class PYCPParser(BaseParser):
                 self._replace('{} = CGlobal(locals(), globals(), {}, {}, {});'.format(name, repr(name), typ, body))
             elif self.peekim(Symbol("ctypedef")):
                 self._start()
-                compound = self.readwhilef(lambda t: t != PARANS2[0] and t != SEMICOLON)
-                name = self._getn(compound[-1:])
-                typ = self._get(compound[:-1])
-                if self.peekim(SEMICOLON):
-                    size = "''"
+                old_i = self.i
+                definition = self.readnwhile(SEMICOLON)
+                funptr = TO in definition
+                self.i = old_i
+                if funptr:
+                    name = self._getn(self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0]))
+                    generic = self._getg()
+                    params = self._get(self.readrawparans(PARANS))
+                    if not self.peekim(TO):
+                        raise Exception("Invalid function pointer definition")
+                    ret = self._get(self.readnwhile(SEMICOLON))
+                    self._stop()
+                    self._replace('{} = {}CFunctionTypedef(locals(), globals(), {}, {}, {}));'.format(
+                        name, generic, repr(name), ret, params))
                 else:
-                    size = self._get(self.readnwhile(SEMICOLON))
-                self._stop()
-                self._replace('{} = CTypedef(locals(), globals(), {}, {}, {});'.format(name, repr(name), typ, size))
+                    compound = self.readwhilef(lambda t: t != PARANS2[0] and t != SEMICOLON)
+                    name = self._getn(compound[-1:])
+                    typ = self._get(compound[:-1])
+                    if self.peekim(SEMICOLON):
+                        size = "''"
+                    else:
+                        size = self._get(self.readnwhile(SEMICOLON))
+                    self._stop()
+                    self._replace('{} = CTypedef(locals(), globals(), {}, {}, {});'.format(
+                        name, repr(name), typ, size))
             elif self.peekim(Symbol("cdefine")):
                 self._start()
                 if self.peekm(SYMBOL):
@@ -99,21 +116,6 @@ class PYCPParser(BaseParser):
                 body = self._get(self.readrawparans(CPARANS))
                 self._stop()
                 self._replace('{} = CMacro(locals(), globals(), {}, {}, {});'.format(name, repr(name), params, body))
-            elif self.peekim(Symbol("cfundef")):
-                self._start()
-                compound = self.readnwhile(PARANS[0])
-                name = self._getn(compound[-1:])
-                ret = compound[:-1]
-                params = self._get(self.readrawparans(PARANS))
-                if self.peekim(TO):
-                    if len(ret) > 0:
-                        raise Exception("cannot have multiple return types in cfundef")
-                    ret = self._get(self.readnwhile(SEMICOLON))
-                else:
-                    ret = self._get(ret)
-                self._stop()
-                self._replace('{} = CFunctionTypedef(locals(), globals(), {}, {}, {});'.format(
-                    name, repr(name), ret, params))
             elif self.peekim(Symbol("cdef")):
                 self._start()
                 name = self._getn(self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0]))

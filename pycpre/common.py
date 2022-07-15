@@ -59,7 +59,7 @@ def Array(T, N):
     return r
 @generic
 def FunctionPtr(R, T):
-    r = CFunctionTypedef(locals(), globals(), 'r', 'R', 'tuple(T)')
+    r = (CFunctionTypedef(locals(), globals(), 'r', 'R', 'tuple(T)'))
     return r
 @generic_callable
 def Global(T, value):

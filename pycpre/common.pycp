@@ -69,7 +69,7 @@ def Array(T, N) {
 
 @generic
 def FunctionPtr(R, T) {
-    cfundef R r(tuple(T));
+    ctypedef r(tuple(T)) -> R;
     return r;
 }
 
