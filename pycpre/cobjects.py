@@ -101,17 +101,20 @@ class CInclude(CObject):
 class CGlobal(CLabelledObject):
     def __init__(self, l, g, name, ret, body):
         self.ret = CFragment(l, g, ret)
-        self.body = CFragment(l, g, body)
+        self.body = CFragment(l, g, body) if body else None
         super().__init__(name)
 
     def __cbuild__(self):
         if self.cache == None:
             rett = self.ret.process()
-            bodyt = self.body.process()
-            self.cache = build_template(
-                glbs="{} {} = {};".format(rett[0], self.label, bodyt[0]))
             self.deps.extend(rett[1])
-            self.deps.extend(bodyt[1])
+            if self.body:
+                bodyt = self.body.process()
+                self.deps.extend(bodyt[1])
+                self.cache = build_template(
+                    glbs="{} {} = {};".format(rett[0], self.label, bodyt[0]))
+            else:
+                self.cache = build_template(glbs="{} {};".format(rett[0], self.label))
 
         return self.cache
 
