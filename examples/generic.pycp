@@ -7,17 +7,17 @@ def Point(T=cdouble) {
         T x;
         T y;
     }
-    S.len = cfunction T(S p) {
+    cdef S.len(S p) -> T {
         T x = p.x;
         T y = p.y;
         return T.add(T.mul(x, x), T.mul(y, y));
-    };
-    S.add = cfunction S(S a, S b) {
+    }
+    cdef S.add(S a, S b) -> S {
         return (S){T.add(a.x, b.x), T.add(a.y, b.y)};
-    };
-    S.sub = cfunction S(S a, S b) {
+    }
+    cdef S.sub(S a, S b) -> S {
         return (S){T.sub(a.x, b.x), T.sub(a.y, b.y)};
-    };
+    }
     return S;
 }
 
@@ -33,7 +33,7 @@ cdef add[T=cint, N=1](T a) -> T {
     return T.add(a, N);
 }
 
-cdef cint main() {
+cdef main() {
     Point* a = new[Point]();
     Point b = {1, 2};
     Point c = Point.add(*a, b);
@@ -45,7 +45,6 @@ cdef cint main() {
     stdio.printf(cdouble.format "\n", add[cdouble, 2](3));
 
     destroy[Point](a);
-    return 0;
 }
 
 build(main, path="generic.c");

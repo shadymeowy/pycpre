@@ -1,6 +1,6 @@
 cinclude "stdio.h" as stdio
 
-cdef cint main() {
+cdef main() -> cint {
     stdio.printf("Hello World !\n");
     return 0;
 }

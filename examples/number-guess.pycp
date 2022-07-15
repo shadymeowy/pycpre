@@ -2,7 +2,7 @@ cinclude "stdio.h" as stdio
 
 import random;
 
-cdef cint main() {
+cdef main() {
     stdio.printf("Totally random guess the number !\n");
     cint guess;
     cint number = random.randint(1, 10);
@@ -17,7 +17,6 @@ cdef cint main() {
     } else {
         stdio.printf("You guessed incorrectly !\n");
     }
-    return 0;
 }
 
 build(main, path="number-guess.c");

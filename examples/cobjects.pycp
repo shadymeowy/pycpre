@@ -1,31 +1,37 @@
 cinclude "stdio.h" as stdio
 
 def apply_cfun(f) {
-    return cfunction void(cint x[], cint n) {
+    cdef fun(cint x[], cint n) {
         for(cint i = 0; i < n; i++) {
             f(x[i]);
         }
-    };
+    }
+    return fun;
 }
 
 def map_cfun(f) {
-    return cfunction void(cint x[], cint n) {
+    cdef fun(cint x[], cint n) {
         for(cint i = 0; i < n; i++) {
             x[i] = f(x[i]);
         }
-    };
+    }
+    return fun;
 }
 
 def add_n(n) {
-    return cfunction cint(cint x) { 
+    if n < 0 {
+        n = 0;
+    }
+    cdef fun(cint x) -> cint { 
         return x + n;
-    };
+    }
+    return fun;
 }
 
 add_two = add_n(2);
 map_add_two = map_cfun(add_two);
 
-cdef void print_int(cint x) {
+cdef print_int(cint x) {
     stdio.printf("%d\n", x);
 }
 
@@ -33,7 +39,7 @@ print_array = apply_cfun(print_int);
 
 N = 10;
 
-cdef cint main() {
+cdef main() -> cint {
     cint x[N] = list(range(N));
     print_array(x, 10);
     map_add_two(x, 10);
