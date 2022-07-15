@@ -2,7 +2,7 @@ cinclude "stdio.h" as stdio
 cinclude "stdlib.h" as stdlib
 
 @generic
-def Point(T=cdouble) {
+def Point(T=cdouble):
     cstruct S {
         T x;
         T y;
@@ -18,8 +18,7 @@ def Point(T=cdouble) {
     cdef S.sub(S a, S b) -> S {
         return (S){T.sub(a.x, b.x), T.sub(a.y, b.y)};
     }
-    return S;
-}
+    return S
 
 cdef new[T]() -> T* {
     return stdlib.calloc(1, sizeof(T));
@@ -47,4 +46,4 @@ cdef main() {
     destroy[Point](a);
 }
 
-build(main, path="generic.c");
+build(main, path="generic.c")

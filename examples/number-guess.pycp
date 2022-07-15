@@ -1,6 +1,6 @@
 cinclude "stdio.h" as stdio
 
-import random;
+import random
 
 cdef main() {
     stdio.printf("Totally random guess the number !\n");
@@ -19,4 +19,4 @@ cdef main() {
     }
 }
 
-build(main, path="number-guess.c");
+build(main, path="number-guess.c")

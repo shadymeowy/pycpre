@@ -1,13 +1,11 @@
-from .cobjects import *;
-from .generic import *;
+from .cobjects import *
+from .generic import *
 
-class DefaultType(CRaw) {
-    def __init__(self, name, format = None) {
-        super().__init__(name);
-        if format {
-            self.format = format;
-        }
-    }
+class DefaultType(CRaw):
+    def __init__(self, name, format = None):
+        super().__init__(name)
+        if format:
+            self.format = format
 
     cmacro add(a, b) {((a)+(b))}
     cmacro sub(a, b) {((a)-(b))}
@@ -53,57 +51,49 @@ class DefaultType(CRaw) {
     cmacro setp(a, b, c) {(a)->b=(c);}
     cmacro ref(a) {(&(a))}
     cmacro deref(a) {(*(a))}
-}
 
 @generic
-def Pointer(T) {
+def Pointer(T):
     ctypedef T *r;
-    return r;
-}
+    return r
 
 @generic
-def Array(T, N) {
+def Array(T, N):
     ctypedef T r[N];
-    return r;
-}
+    return r
 
 @generic
-def FunctionPtr(R, T) {
+def FunctionPtr(R, T):
     ctypedef r(tuple(T)) -> R;
-    return r;
-}
-
+    return r
 
 @generic_callable
-def Global(T, value) {
+def Global(T, value):
     cglobal T r = value;
-    return r;
-}
+    return r
 
 @generic_callable
-def Typedef(T) {
+def Typedef(T):
     ctypedef T r;
-    return r;
-}
+    return r
 
 @generic_callable
-def Define(value) {
+def Define(value):
     cdefine r value;
-    return r;
-}
+    return r
 
-cchar = DefaultType("char", Define("%c"));
-cuchar = DefaultType("unsigned char", Define("%d"));
-cshort = DefaultType("short", Define("%hi"));
-cushort = DefaultType("unsigned short", Define("%hu"));
-cint = DefaultType("int", Define("%d"));
-cuint = DefaultType("unsigned", Define("%du"));
-clong = DefaultType("long", Define("%ld"));
-culong = DefaultType("unsigned long", Define("%lu"));
-cllong = DefaultType("long long", Define("%lld"));
-cullong = DefaultType("unsigned long long", Define("%llu"));
-cfloat = DefaultType("float", Define("%f"));
-cdouble = DefaultType("double", Define("%lf"));
-cvoid = DefaultType("void", Define("%p"));
+cchar = DefaultType("char", Define("%c"))
+cuchar = DefaultType("unsigned char", Define("%d"))
+cshort = DefaultType("short", Define("%hi"))
+cushort = DefaultType("unsigned short", Define("%hu"))
+cint = DefaultType("int", Define("%d"))
+cuint = DefaultType("unsigned", Define("%du"))
+clong = DefaultType("long", Define("%ld"))
+culong = DefaultType("unsigned long", Define("%lu"))
+cllong = DefaultType("long long", Define("%lld"))
+cullong = DefaultType("unsigned long long", Define("%llu"))
+cfloat = DefaultType("float", Define("%f"))
+cdouble = DefaultType("double", Define("%lf"))
+cvoid = DefaultType("void", Define("%p"))
 
 C = CDummySpace();

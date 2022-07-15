@@ -1,43 +1,40 @@
 cinclude "stdio.h" as stdio
 
-def apply_cfun(f) {
+def apply_cfun(f):
     cdef fun(cint x[], cint n) {
         for(cint i = 0; i < n; i++) {
             f(x[i]);
         }
     }
-    return fun;
-}
+    return fun
 
-def map_cfun(f) {
+def map_cfun(f):
     cdef fun(cint x[], cint n) {
         for(cint i = 0; i < n; i++) {
             x[i] = f(x[i]);
         }
     }
-    return fun;
-}
+    return fun
 
-def add_n(n) {
-    if n < 0 {
-        n = 0;
-    }
+def add_n(n):
+    if n < 0:
+        n = 0
+    
     cdef fun(cint x) -> cint { 
         return x + n;
     }
-    return fun;
-}
+    return fun
 
-add_two = add_n(2);
-map_add_two = map_cfun(add_two);
+add_two = add_n(2)
+map_add_two = map_cfun(add_two)
 
 cdef print_int(cint x) {
     stdio.printf("%d\n", x);
 }
 
-print_array = apply_cfun(print_int);
+print_array = apply_cfun(print_int)
 
-N = 10;
+N = 10
 
 cdef main() -> cint {
     cint x[N] = list(range(N));
@@ -47,4 +44,4 @@ cdef main() -> cint {
     return 0;
 }
 
-build(main, path="cobjects.c");
+build(main, path="cobjects.c")
