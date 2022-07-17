@@ -1,7 +1,7 @@
-include "stdio.h" as stdio
+include stdio
 
 cdef main() -> cint {
-    stdio.printf("Hello World !\n");
+    stdio.printf("Hello World!\n");
     return 0;
 }
 

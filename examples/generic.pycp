@@ -1,5 +1,4 @@
-include "stdio.h" as stdio
-include "stdlib.h" as stdlib
+include stdio, stdlib
 
 @generic
 def Point(T=cdouble):

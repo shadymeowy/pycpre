@@ -1,4 +1,4 @@
-from .tokenizer import Symbol, PARANS, PARANS2, PARANS3, CPARANS, SEMICOLON, AT, TO, EQ, AS, STRING, SYMBOL
+from .tokenizer import Symbol, PARANS, PARANS2, PARANS3, CPARANS, SEMICOLON, COMMA, TO, EQ, AS, STRING, SYMBOL
 from .baseparser import BaseParser
 
 
@@ -52,21 +52,32 @@ class PYCPParser(BaseParser):
             self._replace('{} = {}CStruct(locals(), globals(), {}, {}));'.format(name, generic, repr(name), body))
         elif self.peekim(Symbol("include")):
             self._start()
-            if self.peekm(PARANS3[0]):
-                header = repr("<{}>".format(self._getn(self.readrawparans(PARANS3))))
-            elif self.peekm(STRING):
-                header = self._get((self.read(),))
-            else:
-                raise Exception('Expected header name or string')
-            if self.peekim(AS):
-                if self.peekm(SYMBOL):
-                    name = self._getn((self.read(),))
+            headers = []
+            names = []
+            while True:
+                name = None
+                if self.peekm(PARANS3[0]):
+                    header = repr("<{}>".format(self._getn(self.readrawparans(PARANS3))))
+                elif self.peekm(STRING):
+                    header = repr(self.read().value)
+                elif self.peekm(SYMBOL):
+                    name = self.read().value
+                    header = repr('"{}.h"'.format(name))
                 else:
-                    raise Exception('Expected a symbol for included header')
-            else:
-                name = "_"
+                    raise Exception('Expected header name or string')
+                if self.peekim(AS):
+                    if self.peekm(SYMBOL):
+                        name = self.read().value
+                    else:
+                        raise Exception('Expected a symbol for included header')
+                if not name:
+                    name = "_"
+                names.append(name)
+                headers.append("CInclude(locals(), globals(), {})".format(header))
+                if not self.peekim(COMMA):
+                    break
             self._stop()
-            self._replace('{} = CInclude(locals(), globals(), {});'.format(name, header))
+            self._replace('{} = {};'.format(", ".join(names), ", ".join(headers)))
         elif self.peekim(Symbol("cglobal")):
             self._start()
             compound = self.readwhilef(lambda t: t != EQ and t != SEMICOLON)
@@ -113,7 +124,7 @@ class PYCPParser(BaseParser):
         elif self.peekim(Symbol("define")):
             self._start()
             if self.peekm(SYMBOL):
-                name = self._getn((self.read(),))
+                name = self.read().value
             else:
                 raise Exception('Expected a symbol for defined macro')
             if self.peekm(CPARANS[0]):
