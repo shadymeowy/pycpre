@@ -1,4 +1,4 @@
-from .tokenizer import Symbol, PARANS, PARANS2, PARANS3, CPARANS, SEMICOLON, COMMA, TO, EQ, AS, STRING, SYMBOL
+from .tokenizer import Symbol, PARANS, PARANS2, PARANS3, CPARANS, SEMICOLON, COMMA, TO, EQ, AS, STRING, SYMBOL, DOT
 from .baseparser import BaseParser
 
 
@@ -61,8 +61,16 @@ class PYCPParser(BaseParser):
                 elif self.peekm(STRING):
                     header = repr(self.read().value)
                 elif self.peekm(SYMBOL):
-                    name = self.read().value
-                    header = repr('"{}.h"'.format(name))
+                    t = []
+                    while True:
+                        t.append(self.read().value)
+                        if not self.peekim(DOT):
+                            break
+                    if len(t) == 1:
+                        name = t[0]
+                        header = repr('"{}.h"'.format(t[0]))
+                    else:
+                        header = repr('"{}.h"'.format("/".join(t)))
                 else:
                     raise Exception('Expected header name or string')
                 if self.peekim(AS):
