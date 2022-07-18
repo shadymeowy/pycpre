@@ -186,6 +186,7 @@ class PYCPParser(BaseParser):
             self.peekirm(INCLUDE)
             names = []
             values = []
+            is_paran = self.peekim(PARANS[0])
             while True:
                 if self.peekm(SYMBOL):
                     value = self.read().value
@@ -197,8 +198,11 @@ class PYCPParser(BaseParser):
                         raise Exception('Expected a symbol for included object')
                 names.append(name)
                 values.append(repr(value))
-                if not self.peekim(COMMA):
+                if (is_paran and self.peekm(PARANS[1])) or not self.peekim(COMMA):
                     break
+            if is_paran:
+                if not self.peekim(PARANS[1]):
+                    raise Exception('Expected closing parans')
             self._stop()
             self._replace("{}, = CInclude({}).get_attrs([{}]);".format(", ".join(names), header, ", ".join(values)))
         else:
