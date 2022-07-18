@@ -78,6 +78,12 @@ class BaseParser():
             r.append(self.read())
         return r
 
+    def readnwhile2(self, value1, value2):
+        r = []
+        while self.peeknm(value1) and self.peeknm(value2):
+            r.append(self.read())
+        return r
+
     def readwhilef(self, f):
         r = []
         while f(self.peek()):

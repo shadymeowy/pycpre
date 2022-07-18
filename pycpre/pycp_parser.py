@@ -73,7 +73,7 @@ class PYCPParser(BaseParser):
     def _parse_expr(self):
         if self.peekim(STRUCT):
             self._start()
-            name = self._get_tokens(self.readwhilef(lambda t: t != CPARANS[0] and t != PARANS2[0]))
+            name = self._get_tokens(self.readnwhile2(CPARANS[0], PARANS2[0]))
             generic = self._get_generic()
             body = self._get(self.readrawparans(CPARANS))
             self._stop()
@@ -99,7 +99,7 @@ class PYCPParser(BaseParser):
             self._replace('{} = {};'.format(", ".join(names), ", ".join(headers)))
         elif self.peekim(CGLOBAL):
             self._start()
-            compound = self.readwhilef(lambda t: t != EQ and t != SEMICOLON)
+            compound = self.readnwhile2(EQ, SEMICOLON)
             if self.peekim(SEMICOLON):
                 body = None
             elif self.peekim(EQ):
@@ -118,7 +118,7 @@ class PYCPParser(BaseParser):
             funptr = TO in definition
             self.i = old_i
             if funptr:
-                name = self._get_tokens(self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0]))
+                name = self._get_tokens(self.readnwhile2(PARANS[0], PARANS2[0]))
                 generic = self._get_generic()
                 params = self._get(self.readrawparans(PARANS))
                 if not self.peekim(TO):
@@ -129,7 +129,7 @@ class PYCPParser(BaseParser):
                 self._replace('{} = {}CFunctionTypedef(locals(), globals(), {}, {}, {}));'.format(
                     name, generic, repr(name), ret, params))
             else:
-                compound = self.readwhilef(lambda t: t != PARANS2[0] and t != SEMICOLON)
+                compound = self.readnwhile2(PARANS2[0], SEMICOLON)
                 name = self._get_tokens(compound[-1:])
                 typ = self._get(compound[:-1])
                 if self.peekim(SEMICOLON):
@@ -162,7 +162,7 @@ class PYCPParser(BaseParser):
             self._replace('{} = CMacro(locals(), globals(), {}, {}, {});'.format(name, repr(name), params, body))
         elif self.peekim(CDEF):
             self._start()
-            name = self._get_tokens(self.readwhilef(lambda t: t != PARANS[0] and t != PARANS2[0]))
+            name = self._get_tokens(self.readnwhile2(PARANS[0], PARANS2[0]))
             generic = self._get_generic()
             params = self._get(self.readrawparans(PARANS))
             if self.peekim(TO):
@@ -176,7 +176,7 @@ class PYCPParser(BaseParser):
         elif self.peekim(FROM):
             self._start()
             old_i = self.i
-            self.readwhilef(lambda t: t != IMPORT and t != INCLUDE)
+            self.readnwhile2(IMPORT, INCLUDE)
             include = self.peekm(INCLUDE)
             self.i = old_i
             if not include:
