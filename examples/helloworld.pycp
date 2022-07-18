@@ -1,7 +1,7 @@
-include stdio
+from stdio include printf
 
 cdef main() -> cint {
-    stdio.printf("Hello World!\n");
+    printf("Hello World!\n");
     return 0;
 }
 

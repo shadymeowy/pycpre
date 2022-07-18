@@ -82,7 +82,7 @@ class CStruct(CLabelledObject):
 
 
 class CInclude(CObject):
-    def __init__(self, l, g, header):
+    def __init__(self, header):
         self.header = header
         super().__init__()
 
@@ -97,6 +97,12 @@ class CInclude(CObject):
     def __hasattr__(self, value):
         return True
 
+    def get_attrs(self, names):
+        result = []
+        for name in names:
+            result.append(self.__getattr__(name))
+        return result
+            
 
 class CGlobal(CLabelledObject):
     def __init__(self, l, g, name, ret, body):
