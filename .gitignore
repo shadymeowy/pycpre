@@ -1,0 +1,6 @@
+examples/*.c
+.vscode/
+dist/
+build/
+*.egg-info
+*.out
